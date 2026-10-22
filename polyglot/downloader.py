@@ -90,7 +90,6 @@ from json import loads
 from polyglot import polyglot_path
 from polyglot.detect.langids import isoLangs
 from polyglot.utils import pretty_list
-from icu import Locale
 
 import stat
 from urllib.request import urlopen
@@ -872,19 +871,7 @@ class Downloader(object):
     for lang in langs:
       children = langs[lang]
 
-      name1 = Locale(lang).getDisplayLanguage()
-
-      try:
-        name2 = isoLangs[lang]['name']
-      except:
-        name2 = None
-
-      if name1 and name1 != lang:
-        name = name1
-      elif name2:
-        name = name2
-      else:
-        name = lang
+      name = isoLangs.get(lang, {}).get('name', lang)
 
       id = "{}{}".format(Downloader.LANG_PREFIX, lang)
       name = "{:<20} packages and models".format(name)

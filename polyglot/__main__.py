@@ -11,8 +11,6 @@ else:
   from signal import signal, SIGPIPE, SIG_DFL
 import logging
 
-from icu import Locale
-
 from polyglot.base import Sequence, TextFile, TextFiles
 from polyglot.detect import Detector
 from polyglot.downloader import Downloader

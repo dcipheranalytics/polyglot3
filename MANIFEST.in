@@ -4,6 +4,7 @@ include *.txt
 include Makefile
 
 recursive-include tests *
+recursive-include polyglot/tokenize/data *
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
 

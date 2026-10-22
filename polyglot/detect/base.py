@@ -8,8 +8,9 @@
 import logging
 
 
-from icu import Locale
 import pycld2 as cld2
+
+from polyglot.detect.langids import isoLangs
 
 logger = logging.getLogger(__name__)
 
@@ -22,20 +23,30 @@ class UnknownLanguage(Error):
   """Raised if we can not detect the language of a text snippet."""
 
 
+def canonical_code(code):
+  """Normalize a language tag like ICU's Locale.getName(): "zh-hant" -> "zh_Hant"."""
+  parts = code.replace("-", "_").split("_")
+  out = [parts[0].lower()]
+  for part in parts[1:]:
+    out.append(part.title() if len(part) == 4 else part.upper())
+  return "_".join(out)
+
+
 class Language(object):
   def __init__(self, choice):
     basic_name, code, confidence, bytesize = choice
-    self.locale = Locale(code)
+    self._code = canonical_code(code)
     self.confidence = float(confidence)
     self.read_bytes = int(bytesize)
 
   @property
   def name(self):
-    return self.locale.getDisplayLanguage()
+    lang = self._code.split("_")[0]
+    return isoLangs.get(lang, {}).get("name", lang)
 
   @property
   def code(self):
-    return self.locale.getName()
+    return self._code
 
   def __str__(self):
     return ("name: {:<12}code: {:<9}confidence: {:>5.1f} "

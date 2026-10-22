@@ -45,6 +45,7 @@ setup(
         ],
     },
     include_package_data=True,
+    package_data={'polyglot.tokenize': ['data/*']},
     install_requires=requirements,
     license="GPLv3",
     zip_safe=False,

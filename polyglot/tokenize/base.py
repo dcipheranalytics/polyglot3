@@ -3,33 +3,33 @@
 
 """ Basic text segmenters."""
 
-from icu import Locale, BreakIterator
 from polyglot.base import Sequence
+from polyglot.tokenize.breakiter import sentence_boundaries, word_boundaries
 
 
 class Breaker(object):
   """ Base class to segment text."""
 
   def __init__(self, locale):
-    self.locale = Locale('locale')
-    self.breaker = None
+    # Segmentation follows ICU's root-locale rules for every language.
+    self.locale = locale
+    self.boundaries = None
 
   def transform(self, sequence):
     seq = Sequence(sequence.text)
     seq.idx = [0]
     for segment in sequence:
       offset = seq.idx[-1]
-      self.breaker.setText(segment)
-      seq.idx.extend([offset+x for x in self.breaker])
+      seq.idx.extend([offset+x for x in self.boundaries(segment)[1:]])
     return seq
 
- 
+
 class SentenceTokenizer(Breaker):
   """ Segment text to sentences. """
 
   def __init__(self, locale='en'):
     super(SentenceTokenizer, self).__init__(locale)
-    self.breaker = BreakIterator.createSentenceInstance(self.locale)
+    self.boundaries = sentence_boundaries
 
 
 class WordTokenizer(Breaker):
@@ -37,4 +37,4 @@ class WordTokenizer(Breaker):
 
   def __init__(self, locale='en'):
     super(WordTokenizer, self).__init__(locale)
-    self.breaker = BreakIterator.createWordInstance(self.locale)
+    self.boundaries = word_boundaries
