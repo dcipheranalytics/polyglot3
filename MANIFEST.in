@@ -1,6 +1,6 @@
-include *.rst LICENSE Makefile
-recursive-include polyglot/tokenize/data *
-recursive-include docs *.rst *.txt conf.py Makefile make.bat
+include *.md LICENSE Makefile
+recursive-include polyglot3/tokenize/data *
+recursive-include docs *.md *.txt conf.py Makefile make.bat
 recursive-include tests *.py *.jsonl *.json
 recursive-include tools *.py *.txt
 global-exclude __pycache__ *.py[co]

@@ -1,7 +1,7 @@
 name: publish
 
 # Publishes to PyPI when a GitHub release is published, using PyPI trusted
-# publishing (no API token needed). See docs/Dev.rst for the one-time setup.
+# publishing (no API token needed). See docs/Dev.md for the one-time setup.
 on:
   release:
     types: [published]
