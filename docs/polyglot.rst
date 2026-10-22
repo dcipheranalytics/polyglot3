@@ -5,12 +5,12 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
-    polyglot.detect
-    polyglot.mapping
-    polyglot.tag
-    polyglot.tests
-    polyglot.tokenize
+   polyglot.detect
+   polyglot.mapping
+   polyglot.tag
+   polyglot.tokenize
 
 Submodules
 ----------
@@ -19,63 +19,62 @@ polyglot.base module
 --------------------
 
 .. automodule:: polyglot.base
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :show-inheritance:
+   :undoc-members:
 
 polyglot.decorators module
 --------------------------
 
 .. automodule:: polyglot.decorators
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :show-inheritance:
+   :undoc-members:
 
 polyglot.downloader module
 --------------------------
 
 .. automodule:: polyglot.downloader
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :show-inheritance:
+   :undoc-members:
 
 polyglot.load module
 --------------------
 
 .. automodule:: polyglot.load
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :show-inheritance:
+   :undoc-members:
 
 polyglot.mixins module
 ----------------------
 
 .. automodule:: polyglot.mixins
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :show-inheritance:
+   :undoc-members:
 
 polyglot.text module
 --------------------
 
 .. automodule:: polyglot.text
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :show-inheritance:
+   :undoc-members:
 
 polyglot.utils module
 ---------------------
 
 .. automodule:: polyglot.utils
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   :members:
+   :show-inheritance:
+   :undoc-members:
 
 Module contents
 ---------------
 
 .. automodule:: polyglot
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :show-inheritance:
+   :undoc-members:

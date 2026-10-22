@@ -1,61 +1,80 @@
+polyglot3
+=========
 
-polyglot
-========
+|PyPI| |Tests| |Python|
 
-|Downloads| |Latest Version| |Build Status| |Documentation Status|
+.. |PyPI| image:: https://img.shields.io/pypi/v/polyglot3.svg
+   :target: https://pypi.org/project/polyglot3/
+.. |Tests| image:: https://github.com/dcipheranalytics/polyglot3/actions/workflows/tests.yml/badge.svg
+   :target: https://github.com/dcipheranalytics/polyglot3/actions/workflows/tests.yml
+.. |Python| image:: https://img.shields.io/pypi/pyversions/polyglot3.svg
+   :target: https://pypi.org/project/polyglot3/
 
-.. |Downloads| image:: https://img.shields.io/pypi/dm/polyglot.svg
-   :target: https://pypi.python.org/pypi/polyglot
-.. |Latest Version| image:: https://badge.fury.io/py/polyglot.svg
-   :target: https://pypi.python.org/pypi/polyglot
-.. |Build Status| image:: https://travis-ci.org/aboSamoor/polyglot.png?branch=master
-   :target: https://travis-ci.org/aboSamoor/polyglot
-.. |Documentation Status| image:: https://readthedocs.org/projects/polyglot/badge/?version=latest
-   :target: https://readthedocs.org/builds/polyglot/
-
-Polyglot is a natural language pipeline that supports massive
-multilingual applications.
+polyglot3 is a maintained, Python 3 only continuation of
+`polyglot <https://github.com/aboSamoor/polyglot>`__, a natural language
+pipeline for massively multilingual applications. It keeps polyglot's API
+(``from polyglot.text import Text``) and models, and removes the native
+dependencies that made polyglot hard to install.
 
 -  Free software: GPLv3 license
--  Documentation: http://polyglot.readthedocs.org.
+-  Source: https://github.com/dcipheranalytics/polyglot3
+-  Install: ``pip install polyglot3`` (Python 3.9+, no system libraries)
 
 Features
 ~~~~~~~~
 
--  Tokenization (165 Languages)
--  Language detection (196 Languages)
--  Named Entity Recognition (40 Languages)
--  Part of Speech Tagging (16 Languages)
--  Sentiment Analysis (136 Languages)
--  Word Embeddings (137 Languages)
+-  Tokenization: word and sentence segmentation for all languages
+-  Language detection: 176 languages
+-  Named entity recognition: 25 languages
+-  Part of speech tagging: 7 languages
+-  Sentiment analysis: 136 languages
+-  Word embeddings: 25 languages
 
-Developer
-~~~~~~~~~
+See `Supported languages`_ for the exact lists.
 
--  Rami Al-Rfou @ ``rmyeid gmail com``
+What changed from polyglot
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Quick Tutorial
+-  **No PyICU.** Word and sentence segmentation use a pure-Python port of
+   ICU's break iterators, generated from ICU 78.3's own rules, including the
+   Thai dictionary engine. Outside Chinese, Japanese, Korean, Lao, Khmer and
+   Burmese (which ICU segments with dictionaries that are not bundled), the
+   boundaries match ICU's exactly, so the existing NER and POS models see the
+   tokens they were trained on.
+-  **No pycld2.** Language detection uses fastText's ``lid.176`` model via
+   `fasttext-langdetect <https://pypi.org/project/fasttext-langdetect/>`__.
+-  **Python 3.9 to 3.13 only**; Python 2 support and ``six`` are gone.
+-  **New model host.** Models are downloaded from a Hugging Face dataset and
+   verified against checksums. The original Stony Brook server is offline.
+-  **Removed**: morphological analysis and transliteration (their models are
+   no longer available), and the TextBlob/NLTK leftovers that never worked.
+-  **Fixed**: tokens after emoji and other non-BMP characters were garbled;
+   ``polyglot sentiment`` did nothing; several downloader bugs.
+
+Quick tutorial
 --------------
+
+Download the models for the languages you need (once):
+
+.. code:: bash
+
+    polyglot download LANG:tr LANG:cs
 
 .. code:: python
 
-    import polyglot
     from polyglot.text import Text, Word
 
-Language Detection
+Language detection
 ~~~~~~~~~~~~~~~~~~
 
 .. code:: python
 
-    text = Text("Bonjour, Mesdames.")
-    print("Language Detected: Code={}, Name={}\n".format(text.language.code, text.language.name))
-
+    text = Text("Bugün hava çok güzel, parka gidelim.")
+    print(text.language.code, text.language.name)
 
 .. parsed-literal::
 
-    Language Detected: Code=fr, Name=French
-    
-
+    tr Turkish
 
 Tokenization
 ~~~~~~~~~~~~
@@ -66,122 +85,148 @@ Tokenization
                "Explicit is better than implicit. "
                "Simple is better than complex.")
     print(zen.words)
-
-
-.. parsed-literal::
-
-    [u'Beautiful', u'is', u'better', u'than', u'ugly', u'.', u'Explicit', u'is', u'better', u'than', u'implicit', u'.', u'Simple', u'is', u'better', u'than', u'complex', u'.']
-
-
-.. code:: python
-
     print(zen.sentences)
 
-
 .. parsed-literal::
 
+    ['Beautiful', 'is', 'better', 'than', 'ugly', '.', 'Explicit', 'is', 'better', 'than', 'implicit', '.', 'Simple', 'is', 'better', 'than', 'complex', '.']
     [Sentence("Beautiful is better than ugly."), Sentence("Explicit is better than implicit."), Sentence("Simple is better than complex.")]
 
-
-Part of Speech Tagging
+Part of speech tagging
 ~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
 
-    text = Text(u"O primeiro uso de desobediência civil em massa ocorreu em setembro de 1906.")
-    
-    print("{:<16}{}".format("Word", "POS Tag")+"\n"+"-"*30)
+    text = Text("Petr Novák pracuje v Praze pro společnost Škoda.")
     for word, tag in text.pos_tags:
-        print(u"{:<16}{:>2}".format(word, tag))
-
+        print("{:<16}{}".format(word, tag))
 
 .. parsed-literal::
 
-    Word            POS Tag
-    ------------------------------
-    O               DET
-    primeiro        ADJ
-    uso             NOUN
-    de              ADP
-    desobediência   NOUN
-    civil           ADJ
-    em              ADP
-    massa           NOUN
-    ocorreu         ADJ
-    em              ADP
-    setembro        NOUN
-    de              ADP
-    1906            NUM
+    Petr            PROPN
+    Novák           PROPN
+    pracuje         ADJ
+    v               ADP
+    Praze           NOUN
+    pro             ADP
+    společnost      NOUN
+    Škoda           PROPN
     .               PUNCT
 
-
-Named Entity Recognition
+Named entity recognition
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
 
-    text = Text(u"In Großbritannien war Gandhi mit dem westlichen Lebensstil vertraut geworden")
+    text = Text("Mustafa Kemal Atatürk, 1923 yılında Ankara'da "
+                "Türkiye Cumhuriyeti'ni ilan etti.")
     print(text.entities)
-
 
 .. parsed-literal::
 
-    [I-LOC([u'Gro\\xdfbritannien']), I-PER([u'Gandhi'])]
-
+    [I-PER(['Mustafa', 'Kemal', 'Atatürk']), I-LOC(['Türkiye'])]
 
 Polarity
 ~~~~~~~~
 
 .. code:: python
 
-    print("{:<16}{}".format("Word", "Polarity")+"\n"+"-"*30)
-    for w in zen.words[:6]:
+    text = Text("Bu film harika ama son kısmı berbat.")
+    for w in text.words:
         print("{:<16}{:>2}".format(w, w.polarity))
-
 
 .. parsed-literal::
 
-    Word            Polarity
-    ------------------------------
-    Beautiful        0
-    is               0
-    better           1
-    than             0
-    ugly            -1
+    Bu               0
+    film             0
+    harika           1
+    ama             -1
+    son              0
+    kısmı            0
+    berbat          -1
     .                0
-
 
 Embeddings
 ~~~~~~~~~~
 
 .. code:: python
 
-    word = Word("Obama", language="en")
-    print("Neighbors (Synonms) of {}".format(word)+"\n"+"-"*30)
-    for w in word.neighbors:
-        print("{:<16}".format(w))
-    print("\n\nThe first 10 dimensions out the {} dimensions\n".format(word.vector.shape[0]))
-    print(word.vector[:10])
+    from polyglot.load import load_embeddings
 
+    embeddings = load_embeddings("tr")
+    print(embeddings.nearest_neighbors("Ankara"))
 
 .. parsed-literal::
 
-    Neighbors (Synonms) of Obama
-    ------------------------------
-    Bush            
-    Reagan          
-    Clinton         
-    Ahmadinejad     
-    Nixon           
-    Karzai          
-    McCain          
-    Biden           
-    Huckabee        
-    Lula            
-    
-    
-    The first 10 dimensions out the 256 dimensions
-    
-    [-2.57382345  1.52175975  0.51070285  1.08678675 -0.74386948 -1.18616164
-      2.92784619 -0.25694436 -1.40958667 -2.39675403]
+    ['İstanbul', 'İzmir', 'Bursa', 'Antalya', 'Adana', 'Trabzon', 'Balıkesir', 'Konya', ...]
 
+Supported languages
+-------------------
+
+=========================  =====================================================
+Task                       Languages (ISO 639 codes)
+=========================  =====================================================
+Named entity recognition   ar bg cs et fa fi he hi hr hu id ko lv ms no pt ru sk
+                           sl sr sv th tr uk vi
+Part of speech tagging     bg cs fi hu id sl sv
+Word embeddings            same as named entity recognition
+Sentiment                  136 languages (see the Sentiment docs)
+Language detection         176 languages (see the Detection docs)
+Tokenization               all languages (see the Tokenization docs)
+=========================  =====================================================
+
+Credits and citation
+--------------------
+
+polyglot was created by **Rami Al-Rfou** with contributions from Yingtao Tian
+and others at the Data Science Lab, Stony Brook University. The models come
+from their research. If you use them, please cite the papers:
+
+-  Word embeddings and part of speech tagging:
+   `Polyglot: Distributed Word Representations for Multilingual NLP
+   <https://aclanthology.org/W13-3520/>`__ (CoNLL 2013)
+-  Named entity recognition:
+   `POLYGLOT-NER: Massive Multilingual Named Entity Recognition
+   <https://arxiv.org/abs/1410.3791>`__ (SDM 2015)
+-  Sentiment:
+   `Building sentiment lexicons for all major languages
+   <https://aclanthology.org/P14-2063/>`__ (ACL 2014)
+
+::
+
+    @InProceedings{polyglot:2013:ACL-CoNLL,
+      author    = {Al-Rfou, Rami and Perozzi, Bryan and Skiena, Steven},
+      title     = {Polyglot: Distributed Word Representations for Multilingual NLP},
+      booktitle = {Proceedings of the Seventeenth Conference on Computational Natural Language Learning},
+      month     = {August},
+      year      = {2013},
+      address   = {Sofia, Bulgaria},
+      publisher = {Association for Computational Linguistics},
+      pages     = {183--192},
+      url       = {https://aclanthology.org/W13-3520}
+    }
+
+    @inproceedings{polyglotner,
+      author    = {Al-Rfou, Rami and Kulkarni, Vivek and Perozzi, Bryan and Skiena, Steven},
+      title     = {{Polyglot-NER}: Massive Multilingual Named Entity Recognition},
+      booktitle = {Proceedings of the 2015 {SIAM} International Conference on Data Mining},
+      month     = {April},
+      year      = {2015},
+      publisher = {SIAM}
+    }
+
+    @inproceedings{chen2014building,
+      title     = {Building sentiment lexicons for all major languages},
+      author    = {Chen, Yanqing and Skiena, Steven},
+      booktitle = {Proceedings of the 52nd Annual Meeting of the Association for Computational Linguistics (Short Papers)},
+      pages     = {383--389},
+      year      = {2014}
+    }
+
+Segmentation is derived from `ICU <https://icu.unicode.org/>`__ (Unicode
+License V3) and language detection uses `fastText
+<https://fasttext.cc/docs/en/language-identification.html>`__'s ``lid.176``
+model.
+
+This repository has been updated by the **Dcipher Analytics** dev team with
+help from Claude Opus.

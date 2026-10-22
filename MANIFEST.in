@@ -1,11 +1,6 @@
-include *.rst
-include notebooks/*.ipynb
-include *.txt
-include Makefile
-
-recursive-include tests *
+include *.rst LICENSE Makefile
 recursive-include polyglot/tokenize/data *
-recursive-exclude * __pycache__
-recursive-exclude * *.py[co]
-
-recursive-include docs *.rst conf.py Makefile make.bat
+recursive-include docs *.rst *.txt conf.py Makefile make.bat
+recursive-include tests *.py *.jsonl *.json
+recursive-include tools *.py *.txt
+global-exclude __pycache__ *.py[co]

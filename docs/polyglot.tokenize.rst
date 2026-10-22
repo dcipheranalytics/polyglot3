@@ -1,13 +1,6 @@
 polyglot.tokenize package
 =========================
 
-Subpackages
------------
-
-.. toctree::
-
-    polyglot.tokenize.tests
-
 Submodules
 ----------
 
@@ -15,15 +8,22 @@ polyglot.tokenize.base module
 -----------------------------
 
 .. automodule:: polyglot.tokenize.base
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :show-inheritance:
+   :undoc-members:
 
+polyglot.tokenize.breakiter module
+----------------------------------
+
+.. automodule:: polyglot.tokenize.breakiter
+   :members:
+   :show-inheritance:
+   :undoc-members:
 
 Module contents
 ---------------
 
 .. automodule:: polyglot.tokenize
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -8,23 +8,22 @@ polyglot.detect.base module
 ---------------------------
 
 .. automodule:: polyglot.detect.base
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :show-inheritance:
+   :undoc-members:
 
 polyglot.detect.langids module
 ------------------------------
 
 .. automodule:: polyglot.detect.langids
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   :members:
+   :show-inheritance:
+   :undoc-members:
 
 Module contents
 ---------------
 
 .. automodule:: polyglot.detect
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,71 +1,59 @@
-
 Installation
 ============
 
-Installing/Upgrading From the PyPI
-----------------------------------
+polyglot3 needs Python 3.9 or newer and no system libraries:
 
-::
+.. code:: bash
 
-    $ pip install polyglot
+    pip install polyglot3
 
-Dependencies
-~~~~~~~~~~~~
+This installs the ``polyglot`` package (imported as ``import polyglot``)
+and the ``polyglot`` and ``polyglot3`` command-line tools. Its only
+dependencies are NumPy and
+`fasttext-langdetect <https://pypi.org/project/fasttext-langdetect/>`__.
 
-polyglot depends on `numpy <http://www.numpy.org/>`__, `icu
-<http://site.icu-project.org/home>`__ and `pyicu
-<https://github.com/ovalhub/pyicu>`.
+.. note::
 
-Ubuntu/Debian Linux distribution you can install such packages by executing the
-following command:
+    polyglot3 and the original ``polyglot`` package both install a module
+    named ``polyglot``. Uninstall the original first:
+    ``pip uninstall polyglot``. PyICU and pycld2 are no longer needed.
 
-.. code:: python
+Models
+------
 
-    sudo apt-get install python-numpy libicu-dev python-icu
+Tokenization works out of the box. Every other task needs models, which
+are downloaded once per language and task:
 
-Or if you're using Python 3:
+.. code:: bash
 
-.. code:: python
+    polyglot download LANG:tr        # all models for Turkish
+    polyglot download ner2.cs pos2.cs embeddings2.cs
 
-    sudo apt-get install python3-numpy libicu-dev python3-icu
+See :doc:`Download` for the package names. The language detection model
+(fastText ``lid.176``, about 126 MB) is downloaded automatically on first
+use.
 
-Note: If you try to load ``polyglot`` and it tells you ``ImportError: No module
-named 'icu'``, then it's ``pyicu`` that you're missing.
+Environment variables
+---------------------
 
-From Source
+``POLYGLOT_DATA_PATH``
+    Directory under which models are stored, in ``polyglot_data/``.
+    Defaults to the home directory (``%APPDATA%`` on Windows).
+
+``POLYGLOT_DATA_URL``
+    Server to download models from. Defaults to the polyglot3 Hugging Face
+    dataset; set it to use a mirror.
+
+``FTLANG_CACHE``
+    Directory where the fastText language detection model is cached.
+    Defaults to the system temporary directory.
+
+From source
 -----------
 
-polyglot is actively developed on
-`Github <https://github.com/aboSamoor/polyglot>`__.
+.. code:: bash
 
-You can clone the public repo:
-
-.. code:: python
-
-    git clone https://github.com/aboSamoor/polyglot
-
-Or download one of the following:
-
--  `tarball <https://github.com/aboSamoor/polyglot/tarball/master>`__
--  `zipball <https://github.com/aboSamoor/polyglot/zipball/master>`__
-
-Once you have the source, you can install it into your site-packages
-with:
-
-.. code:: python
-
-    python setup.py install
-
-Get the bleeding edge version
------------------------------
-
-To get the latest development version of polyglot, run :
-
-::
-
-    $ pip install -U git+https://github.com/aboSamoor/polyglot.git@master
-
-Python
-~~~~~~
-
-polyglot supports Python >=2.7 or >=3.4.
+    git clone https://github.com/dcipheranalytics/polyglot3.git
+    cd polyglot3
+    pip install -e ".[test]"
+    python -m pytest

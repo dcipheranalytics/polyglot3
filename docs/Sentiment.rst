@@ -1,186 +1,111 @@
-
 Sentiment
 =========
 
-Polyglot has polarity lexicons for 136 languages. The scale of the
-words' polarity consisted of three degrees: +1 for positive words, and
--1 for negatives words. Neutral words will have a score of 0.
+polyglot has polarity lexicons for 136 languages. Each word is positive
+(+1), neutral (0) or negative (-1).
 
-Languages Coverage
-~~~~~~~~~~~~~~~~~~
+Languages
+---------
 
-.. code:: python
+af als am an ar arz as ast az ba bar be bg bn bo bpy br bs ca ce ceb cs cv cy
+da de diq dv el en eo es et eu fa fi fo fr fy ga gan gd gl gu gv he hi hif hr
+hsb ht hu hy ia id ilo io is it ja jv ka kk km kn ko ku ky la lb li lmo lt lv
+mg mk ml mn mr ms mt my ne nl nn no oc or os pa pam pl pms ps pt qu rm ro ru
+sa sah scn sco se sh si sk sl sq sr su sv sw szl ta te tg th tk tl tr tt ug
+uk ur uz vec vi vls vo wa war yi yo zh zhw
 
-    from polyglot.downloader import downloader
-    print(downloader.supported_languages_table("sentiment2", 3))
+.. code:: bash
 
+    polyglot download sentiment2.tr
 
-.. parsed-literal::
-
-      1. Turkmen                    2. Thai                       3. Latvian                  
-      4. Zazaki                     5. Tagalog                    6. Tamil                    
-      7. Tajik                      8. Telugu                     9. Luxembourgish, Letzeb... 
-     10. Alemannic                 11. Latin                     12. Turkish                  
-     13. Limburgish, Limburgan...  14. Egyptian Arabic           15. Tatar                    
-     16. Lithuanian                17. Spanish; Castilian        18. Basque                   
-     19. Estonian                  20. Asturian                  21. Greek, Modern            
-     22. Esperanto                 23. English                   24. Ukrainian                
-     25. Marathi (Marāṭhī)         26. Maltese                   27. Burmese                  
-     28. Kapampangan               29. Uighur, Uyghur            30. Uzbek                    
-     31. Malagasy                  32. Yiddish                   33. Macedonian               
-     34. Urdu                      35. Malayalam                 36. Mongolian                
-     37. Breton                    38. Bosnian                   39. Bengali                  
-     40. Tibetan Standard, Tib...  41. Belarusian                42. Bulgarian                
-     43. Bashkir                   44. Vietnamese                45. Volapük                  
-     46. Gan Chinese               47. Manx                      48. Gujarati                 
-     49. Yoruba                    50. Occitan                   51. Scottish Gaelic; Gaelic  
-     52. Irish                     53. Galician                  54. Ossetian, Ossetic        
-     55. Oriya                     56. Walloon                   57. Swedish                  
-     58. Silesian                  59. Lombard language          60. Divehi; Dhivehi; Mald... 
-     61. Danish                    62. German                    63. Armenian                 
-     64. Haitian; Haitian Creole   65. Hungarian                 66. Croatian                 
-     67. Bishnupriya Manipuri      68. Hindi                     69. Hebrew (modern)          
-     70. Portuguese                71. Afrikaans                 72. Pashto, Pushto           
-     73. Amharic                   74. Aragonese                 75. Bavarian                 
-     76. Assamese                  77. Panjabi, Punjabi          78. Polish                   
-     79. Azerbaijani               80. Italian                   81. Arabic                   
-     82. Icelandic                 83. Ido                       84. Scots                    
-     85. Sicilian                  86. Indonesian                87. Chinese Word             
-     88. Interlingua               89. Waray-Waray               90. Piedmontese language     
-     91. Quechua                   92. French                    93. Dutch                    
-     94. Norwegian Nynorsk         95. Norwegian                 96. Western Frisian          
-     97. Upper Sorbian             98. Nepali                    99. Persian                  
-    100. Ilokano                  101. Finnish                  102. Faroese                  
-    103. Romansh                  104. Javanese                 105. Romanian, Moldavian, ... 
-    106. Malay                    107. Japanese                 108. Russian                  
-    109. Catalan; Valencian       110. Fiji Hindi               111. Chinese                  
-    112. Cebuano                  113. Czech                    114. Chuvash                  
-    115. Welsh                    116. West Flemish             117. Kirghiz, Kyrgyz          
-    118. Kurdish                  119. Kazakh                   120. Korean                   
-    121. Kannada                  122. Khmer                    123. Georgian                 
-    124. Sakha                    125. Serbian                  126. Albanian                 
-    127. Swahili                  128. Chechen                  129. Sundanese                
-    130. Sanskrit (Saṁskṛta)      131. Venetian                 132. Northern Sami            
-    133. Slovak                   134. Sinhala, Sinhalese       135. Bosnian-Croatian-Serbian 
-    136. Slovene                  
-
+Word polarity
+-------------
 
 .. code:: python
 
     from polyglot.text import Text
 
-Polarity
---------
-
-To inquiry the polarity of a word, we can just call its own attribute
-``polarity``
-
-.. code:: python
-
-    text = Text("The movie was really good.")
-
-.. code:: python
-
-    print("{:<16}{}".format("Word", "Polarity")+"\n"+"-"*30)
+    text = Text("Bu film harika ama son kısmı berbat.")
     for w in text.words:
         print("{:<16}{:>2}".format(w, w.polarity))
 
-
 .. parsed-literal::
 
-    Word            Polarity
-    ------------------------------
-    The              0
-    movie            0
-    was              0
-    really           0
-    good             1
+    Bu               0
+    film             0
+    harika           1
+    ama             -1
+    son              0
+    kısmı            0
+    berbat          -1
     .                0
 
+Text polarity
+-------------
 
-Entity Sentiment
+``Text.polarity`` and ``Sentence.polarity`` average the polarity of the
+non-neutral words, giving a score between -1 and 1 (0 when no word is
+polar):
+
+.. code:: python
+
+    text.polarity
+
+.. parsed-literal::
+
+    -0.3333333333333333
+
+.. code:: python
+
+    text = Text("Barack Obama gave a fantastic speech last night. "
+                "Reports indicate he will move next to New Hampshire.")
+    for sentence in text.sentences:
+        print(sentence.polarity, sentence)
+
+.. parsed-literal::
+
+    1.0 Barack Obama gave a fantastic speech last night.
+    0.0 Reports indicate he will move next to New Hampshire.
+
+Entity sentiment
 ----------------
 
-We can calculate a more sphosticated sentiment score for an entity that
-is mentioned in text as the following:
+For languages with :doc:`NER <NamedEntityRecognition>` models, each entity
+gets a positive and a negative score: the polar words around it, weighted
+by their distance from the entity.
 
 .. code:: python
 
-    blob = ("Barack Obama gave a fantastic speech last night. "
-            "Reports indicate he will move next to New Hampshire.")
-    text = Text(blob)
-
-First, we need split the text into sentneces, this will limit the words
-tha affect the sentiment of an entity to the words mentioned in the
-sentnece.
-
-.. code:: python
-
-    first_sentence = text.sentences[0]
-    print(first_sentence)
-
+    text = Text("Ankara güzel bir şehir ama İstanbul berbat bir trafiğe sahip.")
+    for entity in text.entities:
+        print(entity, entity.positive_sentiment, entity.negative_sentiment)
 
 .. parsed-literal::
 
-    The movie was really good.
+    ['Ankara'] 1.0454545454545454 1.727272727272727
+    ['İstanbul'] 0.8636363636363636 2.0454545454545454
 
+Command line
+------------
 
-Second, we extract the entities
+.. code:: console
 
-.. code:: python
-
-    first_entity = first_sentence.entities[0]
-    print(first_entity)
-
-
-.. parsed-literal::
-
-    [u'Obama']
-
-
-Finally, for each entity we identified, we can calculate the strength of
-the positive or negative sentiment it has on a scale from 0-1
-
-.. code:: python
-
-    first_entity.positive_sentiment
-
-
-
-
-.. parsed-literal::
-
-    0.9375
-
-
-
-.. code:: python
-
-    first_entity.negative_sentiment
-
-
-
-
-.. parsed-literal::
-
-    0
-
-
+    $ echo "harika ama berbat" | polyglot --lang tr sentiment
+    harika           1
+    ama             -1
+    berbat          -1
 
 Citation
-~~~~~~~~
+--------
 
-This work is a direct implementation of the research being described in
-the `Building sentiment lexicons for all major
-languages <http://aclweb.org/anthology/P14-2063>`__ paper. The author of
-this library strongly encourage you to cite the following paper if you
-are using this software.
+The lexicons come from
+`Building sentiment lexicons for all major languages
+<https://aclanthology.org/P14-2063/>`__. Please cite it if you use them::
 
-::
-
-       @inproceedings{chen2014building,
-       title={Building sentiment lexicons for all major languages},
-       author={Chen, Yanqing and Skiena, Steven},
-       booktitle={Proceedings of the 52nd Annual Meeting of the Association for Computational Linguistics (Short Papers)},
-       pages={383--389},
-       year={2014}}
+    @inproceedings{chen2014building,
+      title     = {Building sentiment lexicons for all major languages},
+      author    = {Chen, Yanqing and Skiena, Steven},
+      booktitle = {Proceedings of the 52nd Annual Meeting of the Association for Computational Linguistics (Short Papers)},
+      pages     = {383--389},
+      year      = {2014}
+    }

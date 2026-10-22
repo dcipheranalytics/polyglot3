@@ -3,6 +3,30 @@
 History
 -------
 
+2026.10.1 (2026-10-22)
+----------------------
+
+First release as **polyglot3**, by the Dcipher Analytics dev team.
+
+* Python 3.9 to 3.13 only; Python 2 support and ``six`` removed.
+* Removed the PyICU dependency: word and sentence segmentation use a
+  pure-Python port of ICU 78.3's break iterators (including the Thai
+  dictionary engine) that reproduces ICU's boundaries.
+* Removed the pycld2 dependency: language detection uses fastText's
+  ``lid.176`` model via fasttext-langdetect. Hebrew is now ``he``, not ``iw``.
+* Models are downloaded from a new server (Hugging Face) with checksum
+  verification; ``POLYGLOT_DATA_URL`` selects a mirror.
+* Packaging with ``pyproject.toml``; ``polyglot3`` console script added.
+* Removed morphological analysis and transliteration (models unavailable)
+  and the TextBlob leftovers ``correct()``, ``tokenize()`` and
+  ``np_counts`` (they always raised errors).
+* Bug fixes: garbled tokens after emoji and other non-BMP characters;
+  ``polyglot sentiment`` did nothing; entity sentiment only used the first
+  polar word; ``Embedding.normalize_words()`` failed on expanded
+  vocabularies; ``Downloader.status()`` returned ``None`` for a custom
+  download directory; ``Downloader.supported_language()`` crashed; the CLI
+  closed stdin repeatedly on Python 3.13.
+
 "14.11" (2014-01-11)
 ---------------------
 
