@@ -93,7 +93,7 @@ set of models:
 ```bash
 python tools/data/build_index.py path/to/polyglot_data
 pip install huggingface_hub && hf auth login
-python tools/data/upload_to_hf.py path/to/polyglot_data polyglot3/polyglot3-data
+python tools/data/upload_to_hf.py path/to/polyglot_data dcipheranalytics/polyglot3
 ```
 
 If you host elsewhere, update `DEFAULT_URL` in `polyglot3/downloader.py`.

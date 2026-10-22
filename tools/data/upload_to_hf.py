@@ -3,7 +3,7 @@
 
 Requires `pip install huggingface_hub` and a write token (`hf auth login`).
 
-Usage: python tools/data/upload_to_hf.py path/to/polyglot_data polyglot3/polyglot3-data
+Usage: python tools/data/upload_to_hf.py path/to/polyglot_data dcipheranalytics/polyglot3
 """
 
 import sys

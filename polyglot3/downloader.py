@@ -328,7 +328,7 @@ class Downloader(object):
 
   DEFAULT_URL = os.environ.get(
       'POLYGLOT_DATA_URL',
-      'https://huggingface.co/datasets/polyglot3/polyglot3-data/resolve/main/')
+      'https://huggingface.co/datasets/dcipheranalytics/polyglot3/resolve/main/')
   """The default URL for the Polyglot data server's index.  An
      alternative URL can be specified with the ``POLYGLOT_DATA_URL``
      environment variable or when creating a new ``Downloader`` object.
