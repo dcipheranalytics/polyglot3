@@ -7,9 +7,13 @@ git clone https://github.com/dcipheranalytics/polyglot3.git
 cd polyglot3
 pip install -e ".[test]" ruff build twine
 
+ruff format .                      # format code (CI checks it)
 ruff check polyglot3 tests tools   # errors only (syntax, undefined names, unused code)
 python -m pytest
 ```
+
+`make lint` and `make test` run the same checks as CI, and `make format`
+formats the code.
 
 ## Layout
 

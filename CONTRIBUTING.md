@@ -24,6 +24,7 @@ reproduce.
 3. Create a branch, make your changes, then run the checks:
 
    ```bash
+   ruff format .
    ruff check polyglot3 tests tools
    python -m pytest
    ```

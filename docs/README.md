@@ -74,9 +74,11 @@ tr Turkish
 ### Tokenization
 
 ```python
-zen = Text("Beautiful is better than ugly. "
-           "Explicit is better than implicit. "
-           "Simple is better than complex.")
+zen = Text(
+    "Beautiful is better than ugly. "
+    "Explicit is better than implicit. "
+    "Simple is better than complex."
+)
 print(zen.words)
 print(zen.sentences)
 ```
@@ -109,8 +111,9 @@ společnost      NOUN
 ### Named entity recognition
 
 ```python
-text = Text("Mustafa Kemal Atatürk, 1923 yılında Ankara'da "
-            "Türkiye Cumhuriyeti'ni ilan etti.")
+text = Text(
+    "Mustafa Kemal Atatürk, 1923 yılında Ankara'da Türkiye Cumhuriyeti'ni ilan etti."
+)
 print(text.entities)
 ```
 

@@ -15,6 +15,7 @@ jobs:
           python-version: "3.13"
       - run: pip install ruff
       - run: ruff check polyglot3 tests tools
+      - run: ruff format --check .
 
   test:
     runs-on: ${{ matrix.os }}
