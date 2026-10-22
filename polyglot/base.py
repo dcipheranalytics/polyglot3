@@ -91,7 +91,8 @@ class TextFile(object):
   def __init__(self, file, delimiter=u'\n'):
     self.name = file
     self.delimiter = delimiter
-    self.open_file = open(file, 'r')
+    # Don't close file descriptors we were handed (e.g. stdin).
+    self.open_file = open(file, 'r', closefd=not isinstance(file, int))
     self.buf = StringIO()
 
   def iter_delimiter(self, byte_size=8192):
