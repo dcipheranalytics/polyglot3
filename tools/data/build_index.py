@@ -16,31 +16,35 @@ from pathlib import Path
 
 
 def md5_base64(filename):
-  digest = hashlib.md5()
-  with open(filename, 'rb') as fh:
-    for block in iter(lambda: fh.read(1 << 20), b''):
-      digest.update(block)
-  return base64.b64encode(digest.digest()).decode('ascii')
+    digest = hashlib.md5()
+    with open(filename, "rb") as fh:
+        for block in iter(lambda: fh.read(1 << 20), b""):
+            digest.update(block)
+    return base64.b64encode(digest.digest()).decode("ascii")
 
 
 def build_index(root):
-  root = Path(root)
-  items = []
-  # Packages live at <task>/<lang>/<file>, one file per package.
-  for f in sorted(root.glob("*/*/*")):
-    if f.is_file():
-      items.append({"name": f.relative_to(root).as_posix(),
+    root = Path(root)
+    items = []
+    # Packages live at <task>/<lang>/<file>, one file per package.
+    for f in sorted(root.glob("*/*/*")):
+        if f.is_file():
+            items.append(
+                {
+                    "name": f.relative_to(root).as_posix(),
                     "size": f.stat().st_size,
-                    "md5Hash": md5_base64(f)})
-  return {"items": items}
+                    "md5Hash": md5_base64(f),
+                }
+            )
+    return {"items": items}
 
 
 def main(root):
-  index = build_index(root)
-  with open(Path(root) / "index.json", "w", encoding="utf-8") as fh:
-    json.dump(index, fh, indent=1)
-  print("{} packages indexed".format(len(index["items"])))
+    index = build_index(root)
+    with open(Path(root) / "index.json", "w", encoding="utf-8") as fh:
+        json.dump(index, fh, indent=1)
+    print("{} packages indexed".format(len(index["items"])))
 
 
 if __name__ == "__main__":
-  main(sys.argv[1])
+    main(sys.argv[1])

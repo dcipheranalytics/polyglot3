@@ -8,17 +8,18 @@ from ..utils import _decode
 
 
 class UtilsTest(unittest.TestCase):
-  def setUp(self):
-    pass
+    def setUp(self):
+        pass
 
-  def tearDown(self):
-    pass
+    def tearDown(self):
+        pass
 
-  def test_decode(self):
-    expected = "foo"
-    self.assertEqual(_decode( "foo"), expected)
-    self.assertEqual(_decode(u"foo"), expected)
-    self.assertEqual(_decode(b"foo"), expected)
+    def test_decode(self):
+        expected = "foo"
+        self.assertEqual(_decode("foo"), expected)
+        self.assertEqual(_decode("foo"), expected)
+        self.assertEqual(_decode(b"foo"), expected)
+
 
 if __name__ == "__main__":
-  unittest.main()
+    unittest.main()

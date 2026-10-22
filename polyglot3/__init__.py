@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 
 # polyglot3 is based on polyglot by Rami Al-Rfou <rmyeid@gmail.com>; see AUTHORS.md.
-__author__ = 'Dcipher Analytics AB'
-__email__ = 'info@dcipheranalytics.com'
-__version__ = '2026.10.1'
+__author__ = "Dcipher Analytics AB"
+__email__ = "info@dcipheranalytics.com"
+__version__ = "2026.10.1"
 
 import os
 import sys
 
 from .base import Sequence, TokenSequence
 
-__all__ = ['Sequence', 'TokenSequence']
+__all__ = ["Sequence", "TokenSequence"]
 
 # On Windows, use %APPDATA%
-if sys.platform == 'win32' and 'APPDATA' in os.environ:
-  data_path = os.environ['APPDATA']
+if sys.platform == "win32" and "APPDATA" in os.environ:
+    data_path = os.environ["APPDATA"]
 else:
-  data_path = '~/'
-data_path = os.environ.get('POLYGLOT_DATA_PATH', data_path)
+    data_path = "~/"
+data_path = os.environ.get("POLYGLOT_DATA_PATH", data_path)
 data_path = os.path.abspath(os.path.expanduser(data_path))
 polyglot_path = os.path.join(data_path, "polyglot_data")

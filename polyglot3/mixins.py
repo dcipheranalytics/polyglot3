@@ -3,8 +3,7 @@ import sys
 
 
 class ComparableMixin(object):
-
-    '''Implements rich operators for an object.'''
+    """Implements rich operators for an object."""
 
     def _compare(self, other, method):
         try:
@@ -34,8 +33,7 @@ class ComparableMixin(object):
 
 
 class BlobComparableMixin(ComparableMixin):
-
-    '''Allow blob objects to be comparable with both strings and blobs.'''
+    """Allow blob objects to be comparable with both strings and blobs."""
 
     def _compare(self, other, method):
         if isinstance(other, (str, bytes)):
@@ -45,43 +43,41 @@ class BlobComparableMixin(ComparableMixin):
 
 
 class StringlikeMixin(object):
-
-    '''Make blob objects behave like Python strings.
+    """Make blob objects behave like Python strings.
 
     Expects that classes that use this mixin to have a _strkey() method that
     returns the string to apply string methods to.
-    '''
+    """
 
     def __repr__(self):
-        '''Returns a string representation for debugging.'''
+        """Returns a string representation for debugging."""
         class_name = self.__class__.__name__
-        return '{cls}("{text}")'.format(cls=class_name,
-                                        text=str(self))
+        return '{cls}("{text}")'.format(cls=class_name, text=str(self))
 
     def __str__(self):
-        '''Returns a string representation used in print statements
-        or str(my_blob).'''
+        """Returns a string representation used in print statements
+        or str(my_blob)."""
         return self._strkey()
 
     def __len__(self):
-        '''Returns the length of the raw text.'''
+        """Returns the length of the raw text."""
         return len(self._strkey())
 
     def __iter__(self):
-        '''Makes the object iterable as if it were a string,
+        """Makes the object iterable as if it were a string,
         iterating through the raw string's characters.
-        '''
+        """
         return iter(self._strkey())
 
     def __contains__(self, sub):
-        '''Implements the `in` keyword like a Python string.'''
+        """Implements the `in` keyword like a Python string."""
         return sub in self._strkey()
 
     def __getitem__(self, index):
-        '''Returns a  substring. If index is an integer, returns a Python
+        """Returns a  substring. If index is an integer, returns a Python
         string of a single character. If a range is given, e.g. `blob[3:5]`,
         a new instance of the class is returned.
-        '''
+        """
         if isinstance(index, int):
             return self._strkey()[index]  # Just return a single character
         else:
@@ -89,29 +85,29 @@ class StringlikeMixin(object):
             return self.__class__(self._strkey()[index])
 
     def find(self, sub, start=0, end=sys.maxsize):
-        '''Behaves like the built-in str.find() method. Returns an integer,
+        """Behaves like the built-in str.find() method. Returns an integer,
         the index of the first occurrence of the substring argument sub in the
         sub-string given by [start:end].
-        '''
+        """
         return self._strkey().find(sub, start, end)
 
     def rfind(self, sub, start=0, end=sys.maxsize):
-        '''Behaves like the built-in str.rfind() method. Returns an integer,
+        """Behaves like the built-in str.rfind() method. Returns an integer,
         the index of he last (right-most) occurence of the substring argument
         sub in the sub-sequence given by [start:end].
-        '''
+        """
         return self._strkey().rfind(sub, start, end)
 
     def index(self, sub, start=0, end=sys.maxsize):
-        '''Like blob.find() but raise ValueError when the substring
+        """Like blob.find() but raise ValueError when the substring
         is not found.
-        '''
+        """
         return self._strkey().index(sub, start, end)
 
     def rindex(self, sub, start=0, end=sys.maxsize):
-        '''Like blob.rfind() but raise ValueError when substring is not
+        """Like blob.rfind() but raise ValueError when substring is not
         found.
-        '''
+        """
         return self._strkey().rindex(sub, start, end)
 
     def startswith(self, prefix, start=0, end=sys.maxsize):
@@ -137,8 +133,7 @@ class StringlikeMixin(object):
         return self.__class__(self._strkey().format(*args, **kwargs))
 
     def split(self, sep=None, maxsplit=sys.maxsize):
-        """Behaves like the built-in str.split().
-        """
+        """Behaves like the built-in str.split()."""
         return self._strkey().split(sep, maxsplit)
 
     def strip(self, chars=None):
@@ -148,13 +143,11 @@ class StringlikeMixin(object):
         return self.__class__(self._strkey().strip(chars))
 
     def upper(self):
-        """Like str.upper(), returns new object with all upper-cased characters.
-        """
+        """Like str.upper(), returns new object with all upper-cased characters."""
         return self.__class__(self._strkey().upper())
 
     def lower(self):
-        """Like str.lower(), returns new object with all lower-cased characters.
-        """
+        """Like str.lower(), returns new object with all lower-cased characters."""
         return self.__class__(self._strkey().lower())
 
     def join(self, iterable):

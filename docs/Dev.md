@@ -64,7 +64,8 @@ iterators exactly. The port has three parts:
 1. `tools/icu_port/build_tables.py` compiles ICU's rule files
    (`tools/icu_port/rules/word.txt` and `sent.txt`, from ICU 78.3) and
    Unicode 17 property data into DFA tables, following ICU's `rbbitblb.cpp`
-   (position automaton, rule chaining, `{bof}`):
+   (position automaton, rule chaining, `{bof}`), then formats the output
+   with `ruff format`:
 
    ```bash
    python tools/icu_port/build_tables.py /tmp/ucd polyglot3/tokenize/_tables.py

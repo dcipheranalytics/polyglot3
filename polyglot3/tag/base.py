@@ -11,178 +11,209 @@ Named entity Recognition extractors (NER) Detect three types of entities: {Perso
 import numpy as np
 
 from ..decorators import memoize
-from ..load import load_embeddings, load_ner_model, load_pos_model, load_unified_pos_model
+from ..load import (
+    load_embeddings,
+    load_ner_model,
+    load_pos_model,
+    load_unified_pos_model,
+)
 
+NER_ID_TAG = {0: "O", 1: "I-PER", 2: "I-LOC", 3: "I-ORG"}
 
-NER_ID_TAG = {0: u'O', 1: u'I-PER', 2: u'I-LOC', 3: u'I-ORG'}
+POS_TAG_ID = {
+    "ADJ": 0,
+    "ADP": 1,
+    "ADV": 2,
+    "AUX": 3,
+    "CONJ": 4,
+    "DET": 5,
+    "INTJ": 6,
+    "NOUN": 7,
+    "NUM": 8,
+    "PART": 9,
+    "PRON": 10,
+    "PROPN": 11,
+    "PUNCT": 12,
+    "SCONJ": 13,
+    "SYM": 14,
+    "VERB": 15,
+    "X": 16,
+}
 
-POS_TAG_ID = {u'ADJ': 0, u'ADP': 1, u'ADV': 2, u'AUX': 3, u'CONJ': 4,
-              u'DET': 5, u'INTJ': 6, u'NOUN': 7, u'NUM': 8, u'PART': 9,
-              u'PRON': 10, u'PROPN': 11, u'PUNCT': 12, u'SCONJ': 13,
-              u'SYM': 14, u'VERB': 15, u'X': 16}
+POS_ID_TAG = {v: k for k, v in POS_TAG_ID.items()}
 
-POS_ID_TAG = {v:k for k,v in POS_TAG_ID.items()}
 
 class TaggerBase(object):
-  """Tagger base class that defines the interface. """
-  PAD = u'<PAD>'
-  START = u'<S>'
-  END = u'</S>'
-  UNK = u'<UNK>'
+    """Tagger base class that defines the interface."""
 
-  def __init__(self, lang='en'):
-    """
-    Args:
-      lang: language code to decide which chunker to use.
-    """
-    self.lang = lang
-    self.predictor = self._load_network()
-    self.ID_TAG = {}
-    self.add_bias = True
-    self.context = 2
-    self.transfer = lambda _:_
+    PAD = "<PAD>"
+    START = "<S>"
+    END = "</S>"
+    UNK = "<UNK>"
 
-  @staticmethod
-  def ngrams(sequence, n, transfer=None):
-    part1 = (n-1) * [TaggerBase.PAD] + [TaggerBase.START]
-    if transfer is not None:
-        part2 = [transfer(_) for _ in sequence]
-    else:
-        part2 = sequence
-    part3 = [TaggerBase.END] + (n-1) * [TaggerBase.PAD]
-    seq = part1 + part2 + part3
-    for i in range(n, n+len(sequence)):
-      yield seq[i-n: i+n+1]
+    def __init__(self, lang="en"):
+        """
+        Args:
+          lang: language code to decide which chunker to use.
+        """
+        self.lang = lang
+        self.predictor = self._load_network()
+        self.ID_TAG = {}
+        self.add_bias = True
+        self.context = 2
+        self.transfer = lambda _: _
 
-  def _load_network(self):
-    raise NotImplementedError()
+    @staticmethod
+    def ngrams(sequence, n, transfer=None):
+        part1 = (n - 1) * [TaggerBase.PAD] + [TaggerBase.START]
+        if transfer is not None:
+            part2 = [transfer(_) for _ in sequence]
+        else:
+            part2 = sequence
+        part3 = [TaggerBase.END] + (n - 1) * [TaggerBase.PAD]
+        seq = part1 + part2 + part3
+        for i in range(n, n + len(sequence)):
+            yield seq[i - n : i + n + 1]
 
-  def annotate(self, sent):
-    """Annotate a squence of words with entity tags.
+    def _load_network(self):
+        raise NotImplementedError()
 
-    Args:
-      sent: sequence of strings/words.
-    """
-    preds = []
-    words = []
-    for word, fv in self.sent2examples(sent):
-      probs = self.predictor(fv)
-      tags = probs.argsort()
-      tag = self.ID_TAG[tags[-1]]
+    def annotate(self, sent):
+        """Annotate a squence of words with entity tags.
 
-      words.append(word)
-      preds.append(tag)
+        Args:
+          sent: sequence of strings/words.
+        """
+        preds = []
+        words = []
+        for word, fv in self.sent2examples(sent):
+            probs = self.predictor(fv)
+            tags = probs.argsort()
+            tag = self.ID_TAG[tags[-1]]
 
-    # fix_chunks(preds)
-    annotations = zip(words, preds)
-    return annotations
+            words.append(word)
+            preds.append(tag)
 
-  def sent2examples(self, sent):
-    """ Convert ngrams into feature vectors."""
+        # fix_chunks(preds)
+        annotations = zip(words, preds)
+        return annotations
 
-    # TODO(rmyeid): use expanders.
-    words = [w if w in self.embeddings else TaggerBase.UNK for w in sent]
-    ngrams = TaggerBase.ngrams(words, self.context, self.transfer)
-    for word, ngram in zip(sent, ngrams):
-      fv = np.array([self.embeddings.get(w, self.embeddings.zero_vector()) for w in ngram]).flatten()
-      if self.add_bias:
-        fv = np.hstack((fv, np.array(1)))
-      yield word, fv
+    def sent2examples(self, sent):
+        """Convert ngrams into feature vectors."""
+
+        # TODO(rmyeid): use expanders.
+        words = [w if w in self.embeddings else TaggerBase.UNK for w in sent]
+        ngrams = TaggerBase.ngrams(words, self.context, self.transfer)
+        for word, ngram in zip(sent, ngrams):
+            fv = np.array(
+                [self.embeddings.get(w, self.embeddings.zero_vector()) for w in ngram]
+            ).flatten()
+            if self.add_bias:
+                fv = np.hstack((fv, np.array(1)))
+            yield word, fv
 
 
 class NEChunker(TaggerBase):
-  """Named entity extractor."""
+    """Named entity extractor."""
 
-  def __init__(self, lang='en'):
-    """
-    Args:
-      lang: language code to decide which chunker to use.
-    """
-    super(NEChunker, self).__init__(lang=lang)
-    self.ID_TAG = NER_ID_TAG
+    def __init__(self, lang="en"):
+        """
+        Args:
+          lang: language code to decide which chunker to use.
+        """
+        super(NEChunker, self).__init__(lang=lang)
+        self.ID_TAG = NER_ID_TAG
 
-  def _load_network(self):
-    """ Building the predictor out of the model."""
-    self.embeddings = load_embeddings(self.lang, type='cw', normalize=True)
-    self.model = load_ner_model(lang=self.lang, version=2)
-    first_layer, second_layer = self.model
+    def _load_network(self):
+        """Building the predictor out of the model."""
+        self.embeddings = load_embeddings(self.lang, type="cw", normalize=True)
+        self.model = load_ner_model(lang=self.lang, version=2)
+        first_layer, second_layer = self.model
 
-    def predict_proba(input_):
-      hidden = np.tanh(np.dot(first_layer, input_))
-      hidden = np.hstack((hidden, np.ones((hidden.shape[0], 1))))
-      output =  (second_layer *  hidden).sum(axis=1)
-      output_ = 1.0/(1.0 + np.exp(-output))
-      probs = output_/output_.sum()
-      return probs
-    return predict_proba
+        def predict_proba(input_):
+            hidden = np.tanh(np.dot(first_layer, input_))
+            hidden = np.hstack((hidden, np.ones((hidden.shape[0], 1))))
+            output = (second_layer * hidden).sum(axis=1)
+            output_ = 1.0 / (1.0 + np.exp(-output))
+            probs = output_ / output_.sum()
+            return probs
+
+        return predict_proba
 
 
 class POSTagger(TaggerBase):
-  """Universal Part of Speech Tagger."""
+    """Universal Part of Speech Tagger."""
 
-  def __init__(self, lang='en'):
-    """
-    Args:
-      lang: language code to decide which chunker to use.
-    """
-    super(POSTagger, self).__init__(lang=lang)
-    self.ID_TAG = POS_ID_TAG
-    self.add_bias = False
+    def __init__(self, lang="en"):
+        """
+        Args:
+          lang: language code to decide which chunker to use.
+        """
+        super(POSTagger, self).__init__(lang=lang)
+        self.ID_TAG = POS_ID_TAG
+        self.add_bias = False
 
-  def _load_network(self):
-    """ Building the predictor out of the model."""
-    self.embeddings = load_embeddings(self.lang, type='cw')
-    self.model = load_pos_model(lang=self.lang, version=2)
+    def _load_network(self):
+        """Building the predictor out of the model."""
+        self.embeddings = load_embeddings(self.lang, type="cw")
+        self.model = load_pos_model(lang=self.lang, version=2)
 
-    def predict_proba(input_):
-      hidden = np.tanh(np.dot(input_, self.model["W1"]) + self.model["b1"])
-      output =  np.dot(hidden, self.model["W2"]) + self.model["b2"]
-      scores = np.exp(output)
-      probs = scores/scores.sum()
-      return probs
-    return predict_proba
+        def predict_proba(input_):
+            hidden = np.tanh(np.dot(input_, self.model["W1"]) + self.model["b1"])
+            output = np.dot(hidden, self.model["W2"]) + self.model["b2"]
+            scores = np.exp(output)
+            probs = scores / scores.sum()
+            return probs
+
+        return predict_proba
+
 
 class TransferPOSTagger(TaggerBase):
-  """ The Transfer, Universal Part of Speech Tagger."""
+    """The Transfer, Universal Part of Speech Tagger."""
 
-  # Transfer tagger handles special tokens differently,
-  # It will get a zero vector for them.
+    # Transfer tagger handles special tokens differently,
+    # It will get a zero vector for them.
 
-  def __init__(self, lang='en'):
-    """
-    Args:
-      lang: language code to decide which chunker to use.
-    """
-    super(TransferPOSTagger, self).__init__(lang=lang)
-    self.ID_TAG = POS_ID_TAG
-    self.add_bias = False
-    self.transfer = lambda _:_.lower()
+    def __init__(self, lang="en"):
+        """
+        Args:
+          lang: language code to decide which chunker to use.
+        """
+        super(TransferPOSTagger, self).__init__(lang=lang)
+        self.ID_TAG = POS_ID_TAG
+        self.add_bias = False
+        self.transfer = lambda _: _.lower()
 
-  def _load_network(self):
-    """ Building the predictor out of the model."""
-    self.model = load_unified_pos_model(lang=self.lang)
-    self.embeddings = load_embeddings(self.lang, type='ue')  # 'ue' = unified embeddings
+    def _load_network(self):
+        """Building the predictor out of the model."""
+        self.model = load_unified_pos_model(lang=self.lang)
+        self.embeddings = load_embeddings(
+            self.lang, type="ue"
+        )  # 'ue' = unified embeddings
 
-    def predict_proba(input_):
-      hidden = np.tanh(np.dot(input_, self.model["W1"]) + self.model["b1"])
-      output = np.dot(hidden, self.model["W2"]) + self.model["b2"]
-      scores = np.exp(output)
-      probs = scores/scores.sum()
-      return probs
-    return predict_proba
+        def predict_proba(input_):
+            hidden = np.tanh(np.dot(input_, self.model["W1"]) + self.model["b1"])
+            output = np.dot(hidden, self.model["W2"]) + self.model["b2"]
+            scores = np.exp(output)
+            probs = scores / scores.sum()
+            return probs
+
+        return predict_proba
+
+
+@memoize
+def get_pos_tagger(lang="en"):
+    """Return a POS tagger from the models cache."""
+    return POSTagger(lang=lang)
 
 
 @memoize
-def get_pos_tagger(lang='en'):
-  """Return a POS tagger from the models cache."""
-  return POSTagger(lang=lang)
+def get_transfer_pos_tagger(lang="en"):
+    """Return a Transfer POS tagger from the models cache."""
+    return TransferPOSTagger(lang=lang)
+
 
 @memoize
-def get_transfer_pos_tagger(lang='en'):
-  """Return a Transfer POS tagger from the models cache."""
-  return TransferPOSTagger(lang=lang)
-
-@memoize
-def get_ner_tagger(lang='en'):
-  """Return a NER tagger from the models cache."""
-  return NEChunker(lang=lang)
+def get_ner_tagger(lang="en"):
+    """Return a NER tagger from the models cache."""
+    return NEChunker(lang=lang)

@@ -9,7 +9,7 @@ from ..expansion import CaseExpander
 
 from io import StringIO
 
-word2vec_dump = u"""
+word2vec_dump = """
 9 5
 </s> 0.001329 -0.000965 -0.001856 -0.000425 -0.000381 
 the -0.144928 0.074345 -0.069327 -0.017698 0.090774
@@ -24,49 +24,56 @@ a -0.136669 0.161203 0.192028 0.068527 0.292363
 
 
 class EmbeddingTest(unittest.TestCase):
-  def setUp(self):
-    self.fname = StringIO(word2vec_dump)
-    self.model = Embedding.from_word2vec(self.fname, binary=0, fvocab=None)
-    self.words = ["</s>", "the", ",", ".", "of", "and", "in", "to", "a"]
+    def setUp(self):
+        self.fname = StringIO(word2vec_dump)
+        self.model = Embedding.from_word2vec(self.fname, binary=0, fvocab=None)
+        self.words = ["</s>", "the", ",", ".", "of", "and", "in", "to", "a"]
 
-  def tearDown(self):
-    pass
+    def tearDown(self):
+        pass
 
-  def test_model_words(self):
-    self.assertEqual(self.model.words, self.words)
-    self.assertAlmostEqual(self.model[self.words[-1]][-1], 0.292363)
+    def test_model_words(self):
+        self.assertEqual(self.model.words, self.words)
+        self.assertAlmostEqual(self.model[self.words[-1]][-1], 0.292363)
 
-  def test_most_frequent(self):
-    model = self.model.most_frequent(3)
-    self.assertEqual(model.words, self.words[:3])
-    self.assertEqual(model.shape, (3, 5))
+    def test_most_frequent(self):
+        model = self.model.most_frequent(3)
+        self.assertEqual(model.words, self.words[:3])
+        self.assertEqual(model.shape, (3, 5))
 
-  def test_model_shape(self):
-    self.assertEqual(self.model.shape, (9, 5))
+    def test_model_shape(self):
+        self.assertEqual(self.model.shape, (9, 5))
 
-  def test_deletion(self):
-    del self.model[self.words[5]]
-    self.assertEqual(self.model.shape, (8, 5))
-    self.assertEqual(self.model.words, self.words[:5]+self.words[6:])
-    self.assertFalse(self.words[5] in self.model)
+    def test_deletion(self):
+        del self.model[self.words[5]]
+        self.assertEqual(self.model.shape, (8, 5))
+        self.assertEqual(self.model.words, self.words[:5] + self.words[6:])
+        self.assertFalse(self.words[5] in self.model)
 
-  def test_word_with_space(self):
-    new_dump = word2vec_dump.replace("9", "10") + u"\na b 1.0 2.0 3.0 4.0 5.0"
-    fname = StringIO(new_dump)
-    model = Embedding.from_word2vec(fname, binary=0, fvocab=None)
-    self.assertEqual(model.words[-1], u"a b")
+    def test_word_with_space(self):
+        new_dump = word2vec_dump.replace("9", "10") + "\na b 1.0 2.0 3.0 4.0 5.0"
+        fname = StringIO(new_dump)
+        model = Embedding.from_word2vec(fname, binary=0, fvocab=None)
+        self.assertEqual(model.words[-1], "a b")
 
-  def test_norm(self):
-    model = self.model.normalize_words()
-    norms = (model.vectors ** 2).sum(axis=1)
-    _ = [self.assertAlmostEqual(x,y, places=6) for x,y in zip(norms, [1.]*model.shape[0])]
+    def test_norm(self):
+        model = self.model.normalize_words()
+        norms = (model.vectors**2).sum(axis=1)
+        _ = [
+            self.assertAlmostEqual(x, y, places=6)
+            for x, y in zip(norms, [1.0] * model.shape[0])
+        ]
 
-  def test_norm_expanded_vocabulary(self):
-    self.model.apply_expansion(CaseExpander)
-    model = self.model.normalize_words()
-    self.assertAlmostEqual((model["The"] ** 2).sum(), 1., places=6)
-    self.assertAlmostEqual((self.model["the"] ** 2).sum(), (0.144928**2 + 0.074345**2 + 0.069327**2 + 0.017698**2 + 0.090774**2), places=6)
-    
+    def test_norm_expanded_vocabulary(self):
+        self.model.apply_expansion(CaseExpander)
+        model = self.model.normalize_words()
+        self.assertAlmostEqual((model["The"] ** 2).sum(), 1.0, places=6)
+        self.assertAlmostEqual(
+            (self.model["the"] ** 2).sum(),
+            (0.144928**2 + 0.074345**2 + 0.069327**2 + 0.017698**2 + 0.090774**2),
+            places=6,
+        )
+
 
 if __name__ == "__main__":
-  unittest.main()
+    unittest.main()
