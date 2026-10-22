@@ -28,8 +28,6 @@ Features
 -  Part of Speech Tagging (16 Languages)
 -  Sentiment Analysis (136 Languages)
 -  Word Embeddings (137 Languages)
--  Morphological analysis (135 Languages)
--  Transliteration (69 Languages)
 
 Developer
 ~~~~~~~~~
@@ -186,33 +184,4 @@ Embeddings
     
     [-2.57382345  1.52175975  0.51070285  1.08678675 -0.74386948 -1.18616164
       2.92784619 -0.25694436 -1.40958667 -2.39675403]
-
-
-Morphology
-~~~~~~~~~~
-
-.. code:: python
-
-    word = Text("Preprocessing is an essential step.").words[0]
-    print(word.morphemes)
-
-
-.. parsed-literal::
-
-    [u'Pre', u'process', u'ing']
-
-
-Transliteration
-~~~~~~~~~~~~~~~
-
-.. code:: python
-
-    from polyglot.transliteration import Transliterator
-    transliterator = Transliterator(source_lang="en", target_lang="ru")
-    print(transliterator.transliterate(u"preprocessing"))
-
-
-.. parsed-literal::
-
-    препрокессинг
 

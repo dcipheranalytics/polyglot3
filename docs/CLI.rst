@@ -15,7 +15,7 @@ command ``polyglot``
 .. parsed-literal::
 
     usage: polyglot [-h] [--lang LANG] [--delimiter DELIMITER] [--workers WORKERS] [-l LOG] [--debug]
-                    {detect,morph,tokenize,download,count,cat,ner,pos,transliteration,sentiment} ...
+                    {detect,tokenize,download,count,cat,ner,pos,sentiment} ...
     
     optional arguments:
       -h, --help            show this help message and exit
@@ -29,7 +29,7 @@ command ``polyglot``
     tools:
       multilingual tools for all languages
     
-      {detect,morph,tokenize,download,count,cat,ner,pos,transliteration,sentiment}
+      {detect,tokenize,download,count,cat,ner,pos,sentiment}
         detect              Detect the language(s) used in text.
         tokenize            Tokenize text into sentences and words.
         download            Download polyglot resources and models.
@@ -37,7 +37,6 @@ command ``polyglot``
         cat                 Print the contents of the input file to the screen.
         ner                 Named entity recognition chunking.
         pos                 Part of Speech tagger.
-        transliteration     Rewriting the input in the target language script.
         sentiment           Classify text to positive and negative polarity.
 
 

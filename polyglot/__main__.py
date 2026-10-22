@@ -21,11 +21,9 @@ from icu import Locale
 from polyglot.base import Sequence, TextFile, TextFiles
 from polyglot.detect import Detector
 from polyglot.downloader import Downloader
-from polyglot.load import load_morfessor_model
 from polyglot.mapping import CountedVocabulary
 from polyglot.tag import NEChunker, POSTagger
 from polyglot.tokenize import SentenceTokenizer, WordTokenizer
-from polyglot.transliteration import Transliterator
 from polyglot.utils import _print
 
 if sys.platform == 'win32':
@@ -61,28 +59,6 @@ def tag(tagger, args):
   for l in args.input:
     words = l.strip().split()
     line_annotations = [u"{:<16}{:<5}".format(w,p) for w, p in tagger.annotate(words)]
-    _print(u"\n".join(line_annotations))
-    _print(u"")
-
-
-def transliterate(args):
-  """Transliterate words according to the target language."""
-  t = Transliterator(source_lang=args.lang,
-                     target_lang=args.target)
-  for l in args.input:
-    words = l.strip().split()
-    line_annotations = [u"{:<16}{:<16}".format(w, t.transliterate(w)) for w in words]
-    _print(u"\n".join(line_annotations))
-    _print(u"")
-
-
-def morphemes(args):
-  """Segment words according to their morphemes."""
-  morfessor = load_morfessor_model(lang=args.lang)
-  for l in args.input:
-    words = l.strip().split()
-    morphemes = [(w, u"_".join(morfessor.viterbi_segment(w)[0])) for w in words]
-    line_annotations = [u"{:<16}{:<5}".format(w,p) for w, p in morphemes]
     _print(u"\n".join(line_annotations))
     _print(u"")
 
@@ -183,10 +159,6 @@ def main():
                                    help="Detect the language(s) used in text.")
   detector.set_defaults(func=detect)
 
-  # Morphological Analyzer
-  morph = subparsers.add_parser('morph')
-  morph.set_defaults(func=morphemes)
-
   # Tokenizer
   tokenizer = subparsers.add_parser('tokenize',
                                     help="Tokenize text into sentences and words.")
@@ -238,14 +210,6 @@ def main():
   ner = subparsers.add_parser('pos',
                               help="Part of Speech tagger.")
   ner.set_defaults(func=pos_tag)
-
-  # Transliteration
-  transliterator = subparsers.add_parser('transliteration',
-                                         help="Rewriting the input in the "
-                                              "target language script.")
-  transliterator.add_argument("--target", default="en",
-                              help="Language code of the target language.")
-  transliterator.set_defaults(func=transliterate)
 
   # Sentiment Analysis
   senti = subparsers.add_parser('sentiment',

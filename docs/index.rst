@@ -23,8 +23,6 @@ Contents:
    Embeddings
    POS
    NamedEntityRecognition
-   MorphologicalAnalysis
-   Transliteration
    Sentiment
    modules
 

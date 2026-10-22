@@ -11,12 +11,11 @@ from polyglot.base import Sequence, TextFile, TextFiles
 from polyglot.detect import Detector, Language
 from polyglot.decorators import cached_property
 from polyglot.downloader import Downloader
-from polyglot.load import load_embeddings, load_morfessor_model
+from polyglot.load import load_embeddings
 from polyglot.mapping import CountedVocabulary
 from polyglot.mixins import BlobComparableMixin, StringlikeMixin
 from polyglot.tag import get_pos_tagger, get_transfer_pos_tagger, get_ner_tagger
 from polyglot.tokenize import SentenceTokenizer, WordTokenizer
-from polyglot.transliteration import Transliterator
 from polyglot.utils import _print
 
 from .mixins import basestring
@@ -109,20 +108,6 @@ class BaseBlob(StringlikeMixin, BlobComparableMixin):
   @cached_property
   def transfer_pos_tagger(self):
     return get_transfer_pos_tagger(lang=self.language.code)
-
-  @cached_property
-  def morpheme_analyzer(self):
-    return load_morfessor_model(lang=self.language.code)
-
-  def transliterate(self, target_language="en"):
-    """Transliterate the string to the target language."""
-    return WordList([w.transliterate(target_language) for w in self.words],
-                     language=target_language, parent=self)
-
-  @cached_property
-  def morphemes(self):
-    words, score = self.morpheme_analyzer.viterbi_segment(self.raw)
-    return WordList(words, language=self.language.code, parent=self)
 
 
   @cached_property
@@ -281,15 +266,6 @@ class Word(unicode):
 
 
   @cached_property
-  def morpheme_analyzer(self):
-    return load_morfessor_model(lang=self.language)
-
-  @cached_property
-  def morphemes(self):
-    words, score = self.morpheme_analyzer.viterbi_segment(self.string)
-    return WordList(words, parent=self, language=self.language)
-
-  @cached_property
   def detected_languages(self):
     return Detector(self.string, quiet=True)
 
@@ -323,12 +299,6 @@ class Word(unicode):
   def detect_language(self):
     """Detect the word's language."""
     return self.language
-
-  def transliterate(self, target_language="en"):
-    """Transliterate the string to the target language."""
-    t = Transliterator(source_lang=self.language,
-                       target_lang=target_language)
-    return t.transliterate(self.string)
 
 
 class WordList(list):

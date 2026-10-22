@@ -17,6 +17,4 @@ Welcome to polyglot's documentation!
    Embeddings
    POS
    NamedEntityRecognition
-   MorphologicalAnalysis
-   Transliteration
    Sentiment

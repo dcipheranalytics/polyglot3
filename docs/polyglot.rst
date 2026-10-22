@@ -11,7 +11,6 @@ Subpackages
     polyglot.tag
     polyglot.tests
     polyglot.tokenize
-    polyglot.transliteration
 
 Submodules
 ----------

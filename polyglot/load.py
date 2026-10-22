@@ -3,10 +3,8 @@
 
 from os import path
 import os
-from tempfile import NamedTemporaryFile
 
 import numpy as np
-import morfessor
 
 from six import PY2
 from six.moves import cPickle as pickle
@@ -122,37 +120,3 @@ def load_unified_pos_model(lang="en"):
   src_dir = "unipos"
   p = locate_resource(src_dir, lang)
   return dict(np.load(p))
-
-
-@memoize
-def load_morfessor_model(lang="en", version="2"):
-  """Return a morfessor model for `lang` and of version `version`
-
-  Args:
-    lang (string): language code.
-    version (string): version of the parameters to be used.
-  """
-  src_dir = "morph{}".format(version)
-  p = locate_resource(src_dir, lang)
-  file_handler = _open(p)
-  tmp_file_ = NamedTemporaryFile(delete=False)
-  tmp_file_.write(file_handler.read())
-  tmp_file_.close()
-  io = morfessor.MorfessorIO()
-  model = io.read_any_model(tmp_file_.name)
-  os.remove(tmp_file_.name)
-  return model
-
-
-@memoize
-def load_transliteration_table(lang="en", version="2"):
-  """Return a morfessor model for `lang` and of version `version`
-
-  Args:
-    lang (string): language code.
-    version (string): version of the parameters to be used.
-  """
-  src_dir = "transliteration{}".format(version)
-  p = locate_resource(src_dir, lang)
-  file_handler = _open(p)
-  return pickle.load(file_handler)
