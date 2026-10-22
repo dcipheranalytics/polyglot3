@@ -3,7 +3,6 @@
 
 from .base import OrderedVocabulary
 from collections import defaultdict
-from six import iteritems
 import re
 import logging
 
@@ -17,7 +16,7 @@ class VocabExpander(OrderedVocabulary):
     self.aux_word_id = defaultdict(lambda: [])
     self.formatters = formatters
     self.expand(formatters)
-    self.aux_id_word = {id_:w for w, id_ in iteritems(self.aux_word_id)}
+    self.aux_id_word = {id_:w for w, id_ in self.aux_word_id.items()}
 
   def __getitem__(self, key):
     try:
@@ -67,9 +66,9 @@ class VocabExpander(OrderedVocabulary):
     for formatter in formatters:
       self._expand(formatter)
     if self.strategy == 'average':
-      self.aux_word_id = {w: tuple(sorted(ids)) for w, ids in iteritems(self.aux_word_id)}
+      self.aux_word_id = {w: tuple(sorted(ids)) for w, ids in self.aux_word_id.items()}
     elif self.strategy == 'most_frequent':
-      self.aux_word_id = {w: min(ids) for w, ids in iteritems(self.aux_word_id)}
+      self.aux_word_id = {w: min(ids) for w, ids in self.aux_word_id.items()}
     else:
       raise ValueError("A strategy is needed")
 

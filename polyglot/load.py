@@ -6,8 +6,7 @@ import os
 
 import numpy as np
 
-from six import PY2
-from six.moves import cPickle as pickle
+import pickle
 
 from . import polyglot_path
 from .decorators import memoize

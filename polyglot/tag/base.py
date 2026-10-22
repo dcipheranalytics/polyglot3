@@ -9,7 +9,6 @@ Named entity Recognition extractors (NER) Detect three types of entities: {Perso
 """
 
 import numpy as np
-from six.moves import range
 
 from ..decorators import memoize
 from ..load import load_embeddings, load_ner_model, load_pos_model, load_unified_pos_model

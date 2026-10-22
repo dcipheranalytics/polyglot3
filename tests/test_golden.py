@@ -28,7 +28,7 @@ pytestmark = pytest.mark.skipif(not os.path.isdir(polyglot_path),
                                 reason="polyglot models not available")
 
 
-@pytest.mark.parametrize("record", load_records())
+@pytest.mark.parametrize("record", list(load_records()))
 def test_matches_golden(record):
   if "error" in record:
     with pytest.raises(Exception) as excinfo:

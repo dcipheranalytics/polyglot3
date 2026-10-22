@@ -18,10 +18,6 @@ from polyglot.tag import get_pos_tagger, get_transfer_pos_tagger, get_ner_tagger
 from polyglot.tokenize import SentenceTokenizer, WordTokenizer
 from polyglot.utils import _print
 
-from .mixins import basestring
-
-import six
-from six import text_type as unicode
 
 class BaseBlob(StringlikeMixin, BlobComparableMixin):
   """An abstract base class that Sentence, Text will inherit from.
@@ -31,11 +27,11 @@ class BaseBlob(StringlikeMixin, BlobComparableMixin):
   """
 
   def __init__(self, text):
-    if not isinstance(text, basestring):
+    if not isinstance(text, (str, bytes)):
         raise TypeError('The `text` argument passed to `__init__(text)` '
                         'must be a unicode string, not {0}'.format(type(text)))
     self.raw = text
-    if not isinstance(text, unicode):
+    if isinstance(text, bytes):
       self.raw = text.decode("utf-8")
 
     self.string = self.raw
@@ -200,7 +196,7 @@ class BaseBlob(StringlikeMixin, BlobComparableMixin):
     :rtype: :class:`BaseBlob <BaseBlob>`
     """
     # regex matches: contraction or word or punctuation or whitespace
-    tokens = nltk.tokenize.regexp_tokenize(self.raw, "\w*('\w*)+|\w+|[^\w\s]|\s")
+    tokens = nltk.tokenize.regexp_tokenize(self.raw, r"\w*('\w*)+|\w+|[^\w\s]|\s")
     corrected = (Word(w).correct() for w in tokens)
     ret = ''.join(corrected)
     return self.__class__(ret)
@@ -224,7 +220,7 @@ class BaseBlob(StringlikeMixin, BlobComparableMixin):
     Arguments:
     - `other`: a string or a text object
     '''
-    if isinstance(other, basestring):
+    if isinstance(other, (str, bytes)):
         return self.__class__(self.raw + other)
     elif isinstance(other, BaseBlob):
         return self.__class__(self.raw + other.raw)
@@ -240,7 +236,7 @@ class BaseBlob(StringlikeMixin, BlobComparableMixin):
     return WordList(self._strkey().split(sep, maxsplit), parent=self)
 
 
-class Word(unicode):
+class Word(str):
 
   """A simple word representation. Includes methods for inflection,
   translation, and WordNet integration.
@@ -327,10 +323,6 @@ class WordList(list):
     else:
         return self._collection[key]
 
-  def __getslice__(self, i, j):
-    # This is included for Python 2.* compatibility
-    return self.__class__(self._collection[i:j])
-
   def __iter__(self):
     return iter(self._collection)
 
@@ -348,7 +340,7 @@ class WordList(list):
     """Append an object to end. If the object is a string, appends a
     :class:`Word <Word>` object.
     """
-    if isinstance(obj, basestring):
+    if isinstance(obj, (str, bytes)):
         return self._collection.append(Word(obj))
     else:
         return self._collection.append(obj)
@@ -357,7 +349,7 @@ class WordList(list):
     """Extend WordList by appending elements from ``iterable``. If an element
     is a string, appends a :class:`Word <Word>` object.
     """
-    [self._collection.append(Word(e) if isinstance(e, basestring) else e)
+    [self._collection.append(Word(e) if isinstance(e, (str, bytes)) else e)
         for e in iterable]
     return self
 

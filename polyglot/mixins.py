@@ -1,24 +1,6 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
 import sys
 
-import six
-from six import PY2, binary_type
-
-if PY2:
-    string_types = (str, unicode)
-    basestring = basestring
-    def implements_to_string(cls):
-        """Class decorator that renames __str__ to __unicode__ and
-        modifies __str__ that returns utf-8.
-        """
-        cls.__unicode__ = cls.__str__
-        cls.__str__ = lambda x: x.__unicode__().encode('utf-8')
-        return cls
-else: # PY3
-    string_types = (str,)
-    basestring = (str, bytes)
-    implements_to_string = lambda x: x
 
 class ComparableMixin(object):
 
@@ -56,13 +38,12 @@ class BlobComparableMixin(ComparableMixin):
     '''Allow blob objects to be comparable with both strings and blobs.'''
 
     def _compare(self, other, method):
-        if isinstance(other, basestring):
+        if isinstance(other, (str, bytes)):
             # Just compare with the other string
             return method(self._cmpkey(), other)
         return super(BlobComparableMixin, self)._compare(other, method)
 
 
-@implements_to_string
 class StringlikeMixin(object):
 
     '''Make blob objects behave like Python strings.
@@ -75,10 +56,8 @@ class StringlikeMixin(object):
     def __repr__(self):
         '''Returns a string representation for debugging.'''
         class_name = self.__class__.__name__
-        text = self.__unicode__().encode("utf-8") if PY2 else str(self)
-        ret = '{cls}("{text}")'.format(cls=class_name,
-                                        text=text)
-        return binary_type(ret) if PY2 else ret
+        return '{cls}("{text}")'.format(cls=class_name,
+                                        text=str(self))
 
     def __str__(self):
         '''Returns a string representation used in print statements

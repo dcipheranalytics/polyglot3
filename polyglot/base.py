@@ -9,12 +9,6 @@ import os
 from concurrent.futures import ProcessPoolExecutor
 from itertools import islice
 
-import six
-from six.moves import zip
-from six import text_type as unicode
-from six import iteritems
-from six import string_types
-
 
 class Sequence(object):
   """ Text with indices indicates boundaries."""
@@ -23,7 +17,7 @@ class Sequence(object):
 
     if not text:
       raise ValueError("This Sequence is Empty")
-    if not isinstance(text, unicode):
+    if not isinstance(text, str):
       raise ValueError("This is not unicode text instead {}".format(type(text)))
 
     self.__text = text
@@ -43,11 +37,6 @@ class Sequence(object):
     return [x.strip() for x in self if x.strip()]
 
   def __str__(self):
-    if six.PY3:
-      return self.__unicode__()
-    return self.__unicode__().encode("utf-8")
-
-  def __unicode__(self):
     return u'\n'.join(self.tokens())
 
   def split(self, sequence):
@@ -190,7 +179,7 @@ class TextFiles(TextFile):
   """Interface for a sequence of files."""
 
   def __init__(self, files, delimiter=u'\n'):
-    if isinstance(files[0], string_types):
+    if isinstance(files[0], str):
       self.files = [TextFile(f) for f in files]
     self.files = files
     self.delimiter = delimiter

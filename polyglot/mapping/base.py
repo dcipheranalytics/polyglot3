@@ -8,11 +8,6 @@ from collections import Counter
 import os
 from concurrent.futures import ProcessPoolExecutor
 
-import six
-from six.moves import zip
-from six import iteritems
-from six import text_type as unicode
-from six import string_types
 
 from ..base import TextFile
 from ..utils import _open
@@ -47,7 +42,7 @@ class VocabularyBase(object):
     """
     words = self.sanitize_words(words)
     self.word_id = {w:i for i, w in enumerate(sorted(words))}
-    self.id_word = {i:w for w,i in iteritems(self.word_id)}
+    self.id_word = {i:w for w,i in self.word_id.items()}
 
   def sanitize_words(self, words):
     """Guarantees that all textual symbols are unicode.
@@ -56,17 +51,11 @@ class VocabularyBase(object):
       We do not convert numbers, only strings to unicode.
       We assume that the strings are encoded in utf-8.
     """
-    _words = []
-    for w in words:
-      if isinstance(w, string_types) and not isinstance(w, unicode):
-        _words.append(unicode(w, encoding="utf-8"))
-      else:
-        _words.append(w)
-    return _words
+    return list(words)
 
   def __iter__(self):
     """Iterate over the words in a vocabulary."""
-    for w,i in sorted(iteritems(self.word_id), key=lambda wc: wc[1]):
+    for w,i in sorted(self.word_id.items(), key=lambda wc: wc[1]):
       yield w
 
   @property
@@ -74,17 +63,10 @@ class VocabularyBase(object):
     """ Ordered list of words according to their IDs."""
     return list(self)
 
-  def __unicode__(self):
+  def __str__(self):
     return u"\n".join(self.words)
 
-  def __str__(self):
-    if six.PY3:
-      return self.__unicode__()
-    return self.__unicode__().encode("utf-8")
-
   def __getitem__(self, key):
-    if isinstance(key, string_types) and not isinstance(key, unicode):
-      key = unicode(key, encoding="utf-8")
     return self.word_id[key]
 
   def __contains__(self, key):
@@ -99,7 +81,7 @@ class VocabularyBase(object):
     """
     del self.word_id[key]
     self.id_word = dict(enumerate(self.words))
-    self.word_id = {w:i for i,w in iteritems(self.id_word)}
+    self.word_id = {w:i for i,w in self.id_word.items()}
 
   def __len__(self):
     return len(self.word_id)
@@ -146,7 +128,7 @@ class OrderedVocabulary(VocabularyBase):
 
     words = self.sanitize_words(words)
     self.word_id = {w:i for i, w in enumerate(words)}
-    self.id_word = {i:w for w,i in iteritems(self.word_id)}
+    self.id_word = {i:w for w,i in self.word_id.items()}
 
 
   def most_frequent(self, k):
@@ -171,7 +153,7 @@ class CountedVocabulary(OrderedVocabulary):
     """
 
     if isinstance(word_count, dict):
-      word_count = iteritems(word_count)
+      word_count = word_count.items()
     sorted_counts = list(sorted(word_count, key=lambda wc: wc[1], reverse=True))
     words = [w for w,c in sorted_counts]
     super(CountedVocabulary, self).__init__(words=words)
@@ -206,7 +188,7 @@ class CountedVocabulary(OrderedVocabulary):
     """
 
     c = Counter()
-    if isinstance(textfile, string_types):
+    if isinstance(textfile, str):
       textfile = TextFile(textfile)
     for result in textfile.apply(count, workers, job_size):
       c.update(result)
@@ -227,10 +209,10 @@ class CountedVocabulary(OrderedVocabulary):
     Args:
       n (integer): specifies the minimum word frequency allowed.
     """
-    word_count = {w:c for w,c in iteritems(self.word_count) if c >= n}
+    word_count = {w:c for w,c in self.word_count.items() if c >= n}
     return CountedVocabulary(word_count=word_count)
 
-  def __unicode__(self):
+  def __str__(self):
     return u"\n".join([u"{}\t{}".format(w,self.word_count[w]) for w in self.words])
 
   def __delitem__(self, key):

@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
 import sys
 from io import open
 from argparse import ArgumentParser, FileType
@@ -11,10 +10,6 @@ if sys.platform == 'win32':
 else:
   from signal import signal, SIGPIPE, SIG_DFL
 import logging
-
-import six
-from six import text_type as unicode
-from six import iteritems
 
 from icu import Locale
 
@@ -87,7 +82,7 @@ def download(args):
   downloader = Downloader(server_index_url = args.server_index_url)
   if args.packages:
     for pkg_id in args.packages:
-      rv = downloader.download(info_or_id=unicode(pkg_id), download_dir=args.dir,
+      rv = downloader.download(info_or_id=pkg_id, download_dir=args.dir,
                                quiet=args.quiet, force=args.force,
                                halt_on_error=args.halt_on_error)
       if rv == False and args.halt_on_error:
@@ -123,9 +118,7 @@ def segment(args):
 
 
 def remove_escape(text):
-  if six.PY3:
-    return unicode(text.encode("utf8").decode('unicode-escape'))
-  return unicode(text.decode('unicode-escape'))
+  return text.encode("utf8").decode('unicode-escape')
 
 
 def debug(type_, value, tb):

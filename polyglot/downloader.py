@@ -70,7 +70,6 @@ or::
   python -m polyglot.downloader [-d DATADIR] [-q] [-f] [-k] PACKAGE_IDS
 """
 #----------------------------------------------------------------------
-from __future__ import print_function, division, unicode_literals
 
 import time
 import os
@@ -93,13 +92,9 @@ from polyglot.utils import pretty_list
 from icu import Locale
 
 import stat
-import six
-from six import text_type as unicode
-from six import string_types
-from six.moves import input
-from six.moves.urllib.request import urlopen
-from six.moves.urllib.error import HTTPError, URLError
-from six.moves.http_client import HTTPSConnection
+from urllib.request import urlopen
+from urllib.error import HTTPError, URLError
+from http.client import HTTPSConnection
 
 
 logger = logging.getLogger(__name__)
@@ -471,7 +466,7 @@ class Downloader(object):
         print('  [%s] %s %s' % (prefix, info.id.ljust(20, '.'), name))
         lines += len(name.split('\n')) # for more_prompt
         if more_prompt and lines > 20:
-          user_input = unicode(input("Hit Enter to continue: "))
+          user_input = input("Hit Enter to continue: ")
           if (user_input.lower() in ('x', 'q')): return
           lines = 0
       print()
@@ -503,7 +498,7 @@ class Downloader(object):
   #/////////////////////////////////////////////////////////////////
 
   def _info_or_id(self, info_or_id):
-    if isinstance(info_or_id, unicode):
+    if isinstance(info_or_id, str):
       return self.info(info_or_id)
     else:
       return info_or_id
@@ -653,8 +648,8 @@ class Downloader(object):
       return True
 
     else:
-      if isinstance(info_or_id, string_types):
-        info_or_id = unicode(info_or_id)
+      if isinstance(info_or_id, str):
+        info_or_id = str(info_or_id)
       # Define a helper function for displaying output:
       def show(s, prefix2=''):
         print(textwrap.fill(s, initial_indent=prefix+prefix2,
@@ -671,7 +666,7 @@ class Downloader(object):
           self._errors = True
           if not quiet:
             print("Error installing package. Retry? [n/y/e]")
-            choice = unicode(input().strip())
+            choice = input().strip()
             if choice in ['y', 'Y']:
               if not self.download(msg.package.id, download_dir,
                          quiet, force, prefix,
@@ -830,8 +825,7 @@ class Downloader(object):
         index_url = path.join(self._url, 'index.json')
         data = urlopen(index_url).read()
 
-    if six.PY3:
-      data = data.decode('utf-8')
+    data = data.decode('utf-8')
     data = loads(data)
     objs = data["items"]
 
@@ -1070,7 +1064,7 @@ class DownloaderShell(object):
     while True:
       self._simple_interactive_menu(
         'd) Download', 'l) List', ' u) Update', 'c) Config', 'h) Help', 'q) Quit')
-      user_input = unicode(input('Downloader> ').strip())
+      user_input = input('Downloader> ').strip()
       if not user_input: print(); continue
       command = user_input.lower().split()[0]
       args = user_input.split()[1:]
@@ -1108,7 +1102,7 @@ class DownloaderShell(object):
       while True:
         print()
         print('Download which package (l=list; x=cancel)?')
-        user_input = unicode(input('  Identifier> '))
+        user_input = input('  Identifier> ')
         if user_input.lower()=='l':
           self._ds.list(self._ds.download_dir, header=False,
                   more_prompt=True, skip_installed=True)
@@ -1138,7 +1132,7 @@ class DownloaderShell(object):
           print('  [ ] %s %s' % (pid.ljust(20, '.'), name))
         print()
 
-        user_input = unicode(input('  Identifier> '))
+        user_input = input('  Identifier> ')
         if user_input.lower()=='o':
           for pid, pname in stale_packages:
             try: self._ds.download(pid, prefix='  ')

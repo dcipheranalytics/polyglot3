@@ -6,7 +6,6 @@
 import unittest
 from ..utils import _decode
 
-from six import text_type as unicode
 
 class UtilsTest(unittest.TestCase):
   def setUp(self):
@@ -16,7 +15,7 @@ class UtilsTest(unittest.TestCase):
     pass
 
   def test_decode(self):
-    expected = unicode("foo")
+    expected = "foo"
     self.assertEqual(_decode( "foo"), expected)
     self.assertEqual(_decode(u"foo"), expected)
     self.assertEqual(_decode(b"foo"), expected)
