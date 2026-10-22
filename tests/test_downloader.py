@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from polyglot.downloader import Downloader
+from polyglot3.downloader import Downloader
 
 sys.path.insert(0, str(Path(__file__).parents[1] / "tools" / "data"))
 from build_index import build_index  # noqa: E402
@@ -71,7 +71,7 @@ def test_default_url_from_environment():
   import os
   import subprocess
   out = subprocess.run(
-      [sys.executable, "-c", "from polyglot.downloader import Downloader; print(Downloader.DEFAULT_URL)"],
+      [sys.executable, "-c", "from polyglot3.downloader import Downloader; print(Downloader.DEFAULT_URL)"],
       env=dict(os.environ, POLYGLOT_DATA_URL="https://example.org/data/"),
       capture_output=True, text=True, check=True)
   assert out.stdout.strip() == "https://example.org/data/"

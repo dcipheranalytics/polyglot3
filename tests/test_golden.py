@@ -11,8 +11,8 @@ from pathlib import Path
 
 import pytest
 
-from polyglot import polyglot_path
-from polyglot.text import Text
+from polyglot3 import polyglot_path
+from polyglot3.text import Text
 
 GOLDEN_DIR = Path(__file__).parent / "fixtures" / "golden"
 

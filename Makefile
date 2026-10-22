@@ -23,18 +23,14 @@ clean-pyc:
 	find . -name '*~' -exec rm -f {} +
 
 lint:
-	ruff check polyglot tests tools
+	ruff check polyglot3 tests tools
 
 test:
 	python -m pytest
 
 docs:
-	rm -f docs/polyglot.rst
-	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ polyglot
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
-	rm -f docs/*tests*rst
 
 release: dist
 	python -m twine upload dist/*

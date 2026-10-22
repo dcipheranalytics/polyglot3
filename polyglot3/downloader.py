@@ -14,10 +14,10 @@ Packages are named ``<task>.<language>``, e.g. ``ner2.tr`` or
 ``embeddings2.cs``. Collections group packages by language (``LANG:tr``) or
 by task (``TASK:ner2``)::
 
-  >>> from polyglot.downloader import downloader
+  >>> from polyglot3.downloader import downloader
   >>> downloader.download("LANG:tr")  # doctest: +SKIP
 
-The same is available from the command line as ``polyglot download LANG:tr``.
+The same is available from the command line as ``polyglot3 download LANG:tr``.
 Called without a package, ``download()`` starts a small interactive shell.
 
 Download Directory
@@ -50,9 +50,9 @@ from os import path
 from json import loads
 
 
-from polyglot import polyglot_path
-from polyglot.detect.langids import isoLangs
-from polyglot.utils import pretty_list
+from polyglot3 import polyglot_path
+from polyglot3.detect.langids import isoLangs
+from polyglot3.utils import pretty_list
 
 import stat
 from urllib.request import urlopen

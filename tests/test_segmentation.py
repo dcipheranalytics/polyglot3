@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from polyglot.tokenize.breakiter import sentence_boundaries, word_boundaries
+from polyglot3.tokenize.breakiter import sentence_boundaries, word_boundaries
 
 SEGMENTATION_DIR = Path(__file__).parent / "fixtures" / "segmentation"
 

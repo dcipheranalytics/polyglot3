@@ -7,13 +7,13 @@ from collections import defaultdict
 
 import numpy as np
 
-from polyglot.base import Sequence
-from polyglot.detect import Detector, Language
-from polyglot.decorators import cached_property
-from polyglot.load import load_embeddings
-from polyglot.mixins import BlobComparableMixin, StringlikeMixin
-from polyglot.tag import get_pos_tagger, get_transfer_pos_tagger, get_ner_tagger
-from polyglot.tokenize import SentenceTokenizer, WordTokenizer
+from polyglot3.base import Sequence
+from polyglot3.detect import Detector, Language
+from polyglot3.decorators import cached_property
+from polyglot3.load import load_embeddings
+from polyglot3.mixins import BlobComparableMixin, StringlikeMixin
+from polyglot3.tag import get_pos_tagger, get_transfer_pos_tagger, get_ner_tagger
+from polyglot3.tokenize import SentenceTokenizer, WordTokenizer
 
 
 class BaseBlob(StringlikeMixin, BlobComparableMixin):

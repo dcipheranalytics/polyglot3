@@ -9,14 +9,14 @@ else:
   from signal import signal, SIGPIPE, SIG_DFL
 import logging
 
-from polyglot.base import Sequence, TextFile, TextFiles
-from polyglot.detect import Detector
-from polyglot.downloader import Downloader
-from polyglot.mapping import CountedVocabulary
-from polyglot.tag import NEChunker, POSTagger
-from polyglot.text import Word
-from polyglot.tokenize import SentenceTokenizer, WordTokenizer
-from polyglot.utils import _print
+from polyglot3.base import Sequence, TextFile, TextFiles
+from polyglot3.detect import Detector
+from polyglot3.downloader import Downloader
+from polyglot3.mapping import CountedVocabulary
+from polyglot3.tag import NEChunker, POSTagger
+from polyglot3.text import Word
+from polyglot3.tokenize import SentenceTokenizer, WordTokenizer
+from polyglot3.utils import _print
 
 if sys.platform == 'win32':
   signal(SIGABRT, SIG_DFL)
@@ -140,7 +140,7 @@ def debug(type_, value, tb):
 
 
 def main():
-  parser = ArgumentParser("polyglot",
+  parser = ArgumentParser("polyglot3",
                           conflict_handler='resolve')
   subparsers = parser.add_subparsers(title='tools',
                                      description='multilingual tools for all languages')

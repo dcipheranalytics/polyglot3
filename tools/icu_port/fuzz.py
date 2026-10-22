@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Differential fuzzing of polyglot.tokenize.breakiter against PyICU.
+"""Differential fuzzing of polyglot3.tokenize.breakiter against PyICU.
 
 Dev-only: run from a throwaway environment with PyICU (ICU 78.x) installed.
 
@@ -11,8 +11,8 @@ import sys
 
 import icu
 
-from polyglot.tokenize import breakiter
-from polyglot.tokenize.breakiter import sentence_boundaries, word_boundaries
+from polyglot3.tokenize import breakiter
+from polyglot3.tokenize.breakiter import sentence_boundaries, word_boundaries
 
 # Characters exercising the break rules: letters, digits, MidLetter/MidNum
 # punctuation, quotes, Hebrew, Katakana/Hiragana/Han/Hangul, Thai (dictionary),

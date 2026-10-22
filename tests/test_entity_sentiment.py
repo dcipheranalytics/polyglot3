@@ -4,8 +4,8 @@ import os
 
 import pytest
 
-from polyglot import polyglot_path
-from polyglot.text import Text
+from polyglot3 import polyglot_path
+from polyglot3.text import Text
 
 pytestmark = pytest.mark.skipif(
     not all(os.path.isdir(os.path.join(polyglot_path, task, "tr"))

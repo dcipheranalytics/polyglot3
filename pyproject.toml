@@ -6,13 +6,16 @@ build-backend = "setuptools.build_meta"
 name = "polyglot3"
 dynamic = ["version"]
 description = "Multilingual NLP pipeline (tokenization, language detection, NER, POS, sentiment, embeddings) for Python 3, without ICU."
-readme = "README.rst"
+readme = "README.md"
 requires-python = ">=3.9"
 license = "GPL-3.0-or-later AND Unicode-3.0"
-license-files = ["LICENSE", "polyglot/tokenize/data/LICENSE-ICU"]
+license-files = ["LICENSE", "polyglot3/tokenize/data/LICENSE-ICU"]
 authors = [
-  { name = "Rami Al-Rfou", email = "rmyeid@gmail.com" },
-  { name = "Dcipher Analytics dev team" },
+  { name = "Dcipher Analytics AB", email = "info@dcipheranalytics.com" },
+  { name = "Rami Al-Rfou (original polyglot author)", email = "rmyeid@gmail.com" },
+]
+maintainers = [
+  { name = "Dcipher Analytics AB", email = "info@dcipheranalytics.com" },
 ]
 keywords = ["nlp", "multilingual", "tokenization", "named-entity-recognition",
             "part-of-speech", "language-detection", "word-embeddings"]
@@ -47,23 +50,22 @@ Source = "https://github.com/dcipheranalytics/polyglot3"
 "Original project" = "https://github.com/aboSamoor/polyglot"
 
 [project.scripts]
-polyglot = "polyglot.__main__:main"
-polyglot3 = "polyglot.__main__:main"
+polyglot3 = "polyglot3.__main__:main"
 
 [tool.setuptools]
 include-package-data = true
 
 [tool.setuptools.dynamic]
-version = { attr = "polyglot.__version__" }
+version = { attr = "polyglot3.__version__" }
 
 [tool.setuptools.packages.find]
-include = ["polyglot*"]
+include = ["polyglot3*"]
 
 [tool.setuptools.package-data]
-"polyglot.tokenize" = ["data/*"]
+"polyglot3.tokenize" = ["data/*"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "polyglot"]
+testpaths = ["tests", "polyglot3"]
 
 [tool.ruff]
 target-version = "py39"

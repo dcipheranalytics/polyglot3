@@ -9,9 +9,9 @@ from pathlib import Path
 
 import pytest
 
-from polyglot.detect import Detector, Language
-from polyglot.detect import base
-from polyglot.detect.base import UnknownLanguage, canonical_code
+from polyglot3.detect import Detector, Language
+from polyglot3.detect import base
+from polyglot3.detect.base import UnknownLanguage, canonical_code
 
 
 @pytest.fixture

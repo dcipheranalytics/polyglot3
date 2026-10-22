@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Compile ICU break rules into the state tables used by polyglot.tokenize.
+"""Compile ICU break rules into the state tables used by polyglot3.tokenize.
 
 This is a Python port of the parts of ICU's rule-based break iterator
 builder (rbbiscan/rbbisetb/rbbitblb) needed for ICU's root word.txt and
@@ -11,7 +11,7 @@ Inputs (pinned to ICU 78.3 / Unicode 17.0, matching the reference fixtures):
   tools/icu_port/rules/{word,sent}.txt   ICU rule files
   Unicode Character Database files, downloaded into a cache directory.
 
-Usage: python tools/icu_port/build_tables.py UCD_CACHE_DIR polyglot/tokenize/_tables.py
+Usage: python tools/icu_port/build_tables.py UCD_CACHE_DIR polyglot3/tokenize/_tables.py
 """
 
 import os

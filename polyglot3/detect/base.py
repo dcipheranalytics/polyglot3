@@ -13,7 +13,7 @@ import logging
 
 from ftlangdetect import detect as fasttext_detect
 
-from polyglot.detect.langids import isoLangs
+from polyglot3.detect.langids import isoLangs
 
 logger = logging.getLogger(__name__)
 

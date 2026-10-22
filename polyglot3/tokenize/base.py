@@ -3,8 +3,8 @@
 
 """ Basic text segmenters."""
 
-from polyglot.base import Sequence
-from polyglot.tokenize.breakiter import sentence_boundaries, word_boundaries
+from polyglot3.base import Sequence
+from polyglot3.tokenize.breakiter import sentence_boundaries, word_boundaries
 
 
 class Breaker(object):

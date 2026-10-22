@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-__author__ = 'Rami Al-Rfou'
-__email__ = 'rmyeid@gmail.com'
+# polyglot3 is based on polyglot by Rami Al-Rfou <rmyeid@gmail.com>; see AUTHORS.md.
+__author__ = 'Dcipher Analytics AB'
+__email__ = 'info@dcipheranalytics.com'
 __version__ = '2026.10.1'
 
 import os
