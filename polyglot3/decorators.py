@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import functools
+import threading
 
 class cached_property(object):
   """A property that is only computed once per instance and then replaces
@@ -21,12 +22,20 @@ class cached_property(object):
     return value
 
 def memoize(obj):
+  """Cache results by arguments. Thread-safe: concurrent first calls with the
+  same arguments compute the result once, other arguments are not blocked."""
   cache = obj.cache = {}
+  locks = {}
+  locks_lock = threading.Lock()
 
   @functools.wraps(obj)
   def memoizer(*args, **kwargs):
     key = tuple(list(args) + sorted(kwargs.items()))
     if key not in cache:
-      cache[key] = obj(*args, **kwargs)
+      with locks_lock:
+        lock = locks.setdefault(key, threading.Lock())
+      with lock:
+        if key not in cache:
+          cache[key] = obj(*args, **kwargs)
     return cache[key]
   return memoizer

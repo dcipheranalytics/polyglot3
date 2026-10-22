@@ -16,6 +16,7 @@ License & terms of use: see data/LICENSE-ICU (Unicode License V3)
 
 import gzip
 import os
+import threading
 from bisect import bisect_left, bisect_right
 
 from . import _tables
@@ -335,18 +336,21 @@ class _ThaiBreakEngine(object):
 
 _DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 _thai_engine = None
+_thai_engine_lock = threading.Lock()
 
 
 def _get_thai_engine():
   global _thai_engine
   if _thai_engine is None:
-    words = []
-    with gzip.open(os.path.join(_DATA_DIR, "thaidict.txt.gz"), "rt", encoding="utf-8-sig") as fh:
-      for line in fh:
-        line = line.strip()
-        if line and not line.startswith("#"):
-          words.append(line.split()[0])
-    _thai_engine = _ThaiBreakEngine(_ThaiDictionary(words))
+    with _thai_engine_lock:
+      if _thai_engine is None:
+        words = []
+        with gzip.open(os.path.join(_DATA_DIR, "thaidict.txt.gz"), "rt", encoding="utf-8-sig") as fh:
+          for line in fh:
+            line = line.strip()
+            if line and not line.startswith("#"):
+              words.append(line.split()[0])
+        _thai_engine = _ThaiBreakEngine(_ThaiDictionary(words))
   return _thai_engine
 
 

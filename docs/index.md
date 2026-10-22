@@ -10,6 +10,7 @@ Detection
 Tokenization
 CLI
 Download
+Concurrency
 Embeddings
 POS
 NamedEntityRecognition

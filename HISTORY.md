@@ -17,6 +17,8 @@ First release as **polyglot3**, by Dcipher Analytics AB.
 - Models are downloaded from a new server (Hugging Face) with checksum
   verification; `POLYGLOT_DATA_URL` selects a mirror.
 - Packaging with `pyproject.toml`.
+- Thread-safe: models are loaded once per process even when several threads
+  need them at the same time. See the Threads and Concurrency page.
 - Removed morphological analysis and transliteration (models unavailable)
   and the TextBlob leftovers `correct()`, `tokenize()` and `np_counts` (they
   always raised errors).
