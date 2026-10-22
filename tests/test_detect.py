@@ -1,7 +1,7 @@
 """Language detection tests.
 
 The unit tests stub out fastText. The accuracy test uses the real lid.176
-model and runs only if it is already cached (see ftlangdetect's FTLANG_CACHE).
+model and runs only if it is already cached (in $FTLANG_CACHE).
 """
 
 import json
@@ -12,6 +12,7 @@ import pytest
 from polyglot3.detect import Detector, Language
 from polyglot3.detect import base
 from polyglot3.detect.base import UnknownLanguage, canonical_code
+from polyglot3.detect.fasttext import cache_dir, char_ngrams, fasttext_hash
 
 
 @pytest.fixture
@@ -60,10 +61,19 @@ def test_language_codes_and_names():
     assert "Turkish" in Detector.supported_languages()
 
 
-def model_cached():
-    from ftlangdetect.detect import _default_cache_dir
+def test_fasttext_hash():
+    # FNV-1a for ASCII; fastText sign-extends bytes >= 0x80.
+    assert fasttext_hash(b"a") == 0xE40C292C
+    assert fasttext_hash("ğ".encode("utf-8")) == 1292221156
 
-    return (_default_cache_dir() / "lid.176.bin").exists()
+
+def test_char_ngrams():
+    ngrams = [g.decode("utf-8") for g in char_ngrams("<ağ>".encode("utf-8"), 2, 4)]
+    assert ngrams == ["<a", "<ağ", "<ağ>", "ağ", "ağ>", "ğ>"]
+
+
+def model_cached():
+    return (cache_dir() / "lid.176.bin").exists()
 
 
 @pytest.mark.skipif(not model_cached(), reason="fastText lid.176 model not cached")

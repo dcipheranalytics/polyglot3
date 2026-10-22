@@ -2,16 +2,11 @@
 # -*- coding: utf-8 -*-
 
 
-"""Detecting languages with fastText's lid.176 model (via fasttext-langdetect).
-
-The model (~126MB) is downloaded on first use and cached in $FTLANG_CACHE,
-or the system temp directory if that is unset.
-"""
+"""Detecting languages with fastText's lid.176 model (see polyglot3.detect.fasttext)."""
 
 import logging
 
-from ftlangdetect import detect as fasttext_detect
-
+from polyglot3.detect.fasttext import detect as fasttext_detect
 from polyglot3.detect.langids import isoLangs
 
 logger = logging.getLogger(__name__)

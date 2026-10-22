@@ -9,10 +9,8 @@ return the same results as a single-threaded run.
 - Models are loaded once per process. If several threads need a model at the
   same time, one loads it and the others wait for it. Different models load
   in parallel.
-- Language detection uses fastText through
-  [fasttext-langdetect](https://pypi.org/project/fasttext-langdetect/). Its
-  model is loaded once, under a lock, and predictions are safe to run
-  concurrently.
+- Language detection's fastText model is loaded once, under a lock, and
+  predictions are safe to run concurrently.
 - Create a `Text` per document instead of sharing one between threads. A
   `Text` caches its results, so two threads reading the same property of a
   new `Text` may both compute it.
@@ -38,9 +36,6 @@ Threads let you process documents concurrently with other work, such as
 network I/O, but don't use more than one CPU core. For CPU-bound batch jobs,
 use processes (`ProcessPoolExecutor`, `multiprocessing`). Each process loads
 its own copy of the models it uses.
-
-Free-threaded Python builds (3.13t and later) re-enable the GIL when fastText
-is imported, so they behave like regular builds.
 
 ## Examples
 

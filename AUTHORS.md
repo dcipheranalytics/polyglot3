@@ -24,5 +24,5 @@ Kulkarni, Yanqing Chen and Steven Skiena; see the README for citations.
 
 - Tokenization tables and the Thai dictionary are derived from ICU
   (Unicode License V3, `polyglot3/tokenize/data/LICENSE-ICU`).
-- Language detection uses fastText's `lid.176` model through
-  fasttext-langdetect.
+- Language detection uses fastText's `lid.176` model (Creative Commons
+  Attribution-Share-Alike 3.0), downloaded on first use.

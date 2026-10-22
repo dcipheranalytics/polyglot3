@@ -1,5 +1,11 @@
 # History
 
+## 2026.10.2 (2026-10-22)
+
+- Removed the fasttext-langdetect dependency: polyglot3 reads fastText's
+  `lid.176.bin` and runs it with NumPy, with the same predictions. NumPy is
+  the only dependency. The model is still cached in `$FTLANG_CACHE`.
+
 ## 2026.10.1 (2026-10-22)
 
 First release as **polyglot3**, by Dcipher Analytics AB.

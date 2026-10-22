@@ -38,8 +38,8 @@ See [Supported languages](#supported-languages) for the exact lists.
   Burmese (which ICU segments with dictionaries that are not bundled), the
   boundaries match ICU's exactly, so the existing NER and POS models see the
   tokens they were trained on.
-- **No pycld2.** Language detection uses fastText's `lid.176` model via
-  [fasttext-langdetect](https://pypi.org/project/fasttext-langdetect/).
+- **No pycld2.** Language detection uses fastText's `lid.176` model, run
+  with NumPy.
 - **Python 3.9 to 3.13 only**; Python 2 support and `six` are gone.
 - **New model host.** Models are downloaded from a Hugging Face dataset and
   verified against checksums. The original Stony Brook server is offline.

@@ -3,7 +3,7 @@
 # polyglot3 is based on polyglot by Rami Al-Rfou <rmyeid@gmail.com>; see AUTHORS.md.
 __author__ = "Dcipher Analytics AB"
 __email__ = "info@dcipheranalytics.com"
-__version__ = "2026.10.1"
+__version__ = "2026.10.2"
 
 import os
 import sys

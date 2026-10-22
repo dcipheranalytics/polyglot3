@@ -7,8 +7,7 @@ pip install polyglot3
 ```
 
 This installs the `polyglot3` package (`import polyglot3`) and the `polyglot3`
-command-line tool. Its only dependencies are NumPy and
-[fasttext-langdetect](https://pypi.org/project/fasttext-langdetect/).
+command-line tool. Its only dependency is NumPy.
 
 ## Migrating from polyglot
 

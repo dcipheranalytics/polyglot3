@@ -22,8 +22,6 @@ source_suffix = {".md": "markdown"}
 # Anchors for in-page links such as [Supported languages](#supported-languages).
 myst_heading_anchors = 3
 
-# Avoid downloading the fastText model while importing modules for autodoc.
-autodoc_mock_imports = ["ftlangdetect"]
 autodoc_default_options = {
     "members": True,
     "undoc-members": True,

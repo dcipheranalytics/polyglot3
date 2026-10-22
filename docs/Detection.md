@@ -1,9 +1,10 @@
 # Language Detection
 
-polyglot3 detects languages with fastText's pre-trained `lid.176` model
-through [fasttext-langdetect](https://pypi.org/project/fasttext-langdetect/).
-The model (about 126 MB) is downloaded on first use and cached in
-`$FTLANG_CACHE` (default: the system temporary directory).
+polyglot3 detects languages with fastText's pre-trained `lid.176` model,
+which it runs with NumPy; fastText itself is not needed. The model (about
+126 MB) is downloaded on first use and cached in `$FTLANG_CACHE` (default:
+`fasttext-langdetect/` in the system temporary directory, where
+fasttext-langdetect keeps it too).
 
 ```python
 from polyglot3.detect import Detector
