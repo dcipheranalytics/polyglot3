@@ -5,6 +5,7 @@
 
 import unittest
 from ..embeddings import Embedding
+from ..expansion import CaseExpander
 
 from io import StringIO
 
@@ -59,6 +60,12 @@ class EmbeddingTest(unittest.TestCase):
     model = self.model.normalize_words()
     norms = (model.vectors ** 2).sum(axis=1)
     _ = [self.assertAlmostEqual(x,y, places=6) for x,y in zip(norms, [1.]*model.shape[0])]
+
+  def test_norm_expanded_vocabulary(self):
+    self.model.apply_expansion(CaseExpander)
+    model = self.model.normalize_words()
+    self.assertAlmostEqual((model["The"] ** 2).sum(), 1., places=6)
+    self.assertAlmostEqual((self.model["the"] ** 2).sum(), (0.144928**2 + 0.074345**2 + 0.069327**2 + 0.017698**2 + 0.090774**2), places=6)
     
 
 if __name__ == "__main__":

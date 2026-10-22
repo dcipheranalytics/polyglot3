@@ -73,14 +73,6 @@ class BaseBlob(StringlikeMixin, BlobComparableMixin):
     seq = self.word_tokenizer.transform(Sequence(self.raw))
     return WordList(seq.tokens(), parent=self, language=self.language.code)
 
-  def tokenize(self, tokenizer=None):
-    """Return a list of tokens, using ``tokenizer``.
-    :param tokenizer: (optional) A tokenizer object. If None, defaults to
-        this blob's default tokenizer.
-    """
-    t = tokenizer if tokenizer is not None else self.tokenizer
-    return WordList(t.tokenize(self.raw), parent=self)
-
   @cached_property
   def polarity(self):
     """Return the polarity score as a float within the range [-1.0, 1.0]
@@ -124,12 +116,8 @@ class BaseBlob(StringlikeMixin, BlobComparableMixin):
 
   @cached_property
   def pos_tags(self):
-    """Returns an list of tuples of the form (word, POS tag).
-    Example:
-    ::
-        [('At', 'ADP'), ('eight', 'NUM'), ("o'clock", 'NOUN'), ('on', 'ADP'),
-        ('Thursday', 'NOUN'), ('morning', 'NOUN')]
-    :rtype: list of tuples
+    """Returns a list of tuples of the form (word, POS tag), e.g.
+    ``[('Budapest', 'PROPN'), ('Magyarország', 'PROPN'), ...]``.
     """
     tagged_words = []
     for word,t in self.pos_tagger.annotate(self.words):
@@ -155,15 +143,6 @@ class BaseBlob(StringlikeMixin, BlobComparableMixin):
         counts[word] += 1
     return counts
 
-  @cached_property
-  def np_counts(self):
-    """Dictionary of noun phrase frequencies in this text.
-    """
-    counts = defaultdict(int)
-    for phrase in self.noun_phrases:
-        counts[phrase] += 1
-    return counts
-
   def ngrams(self, n=3):
     """Return a list of n-grams (tuples of n successive words) for this
     blob.
@@ -176,14 +155,7 @@ class BaseBlob(StringlikeMixin, BlobComparableMixin):
     return grams
 
   def detect_language(self):
-    """Detect the blob's language using the Google Translate API.
-    Requires an internet connection.
-    Usage:
-    ::
-        >>> b = Text("bonjour")
-        >>> b.language
-        u'fr'
-    """
+    """Return the code of the blob's language, e.g. ``'fr'`` for ``Text("Bonjour")``."""
     return self.language.code
 
   def _cmpkey(self):
@@ -349,12 +321,13 @@ class WordList(list):
 
 class Chunk(WordList):
   """A subsequence within a WordList object. Inherits from :class:`WordList <WordList>`.
-  :param subsequence: A list, the raw sentence.
-  :param start_index: An int, the index where this chunk begins
-                      in WordList. If not given, defaults to 0.
-  :param end_index: An int, the index where this chunk ends in
-                      a WordList. If not given, defaults to the
-                      length of the sentence - 1.
+
+  :param subsequence: A list of words.
+  :param start_index: The index of the first word in the parent's words.
+      Defaults to 0.
+  :param end_index: The index after the last word in the parent's words.
+      Defaults to ``start_index + len(subsequence)``.
+  :param tag: The chunk's label, e.g. ``I-PER``.
   :param parent: Original Baseblob.
   """
 
@@ -398,7 +371,7 @@ class Chunk(WordList):
       sum_neg = sum(non_entity_polarities == -1)
     else:
       polarities = np.array([w.polarity for w in text.words])
-      polarized_positions = np.argwhere(polarities != 0)[0]
+      polarized_positions = np.flatnonzero(polarities)
       polarized_non_entity_positions = non_entity_positions.intersection(polarized_positions)
       sentence_len = len(text.words)
       for i in polarized_non_entity_positions:
@@ -412,12 +385,12 @@ class Chunk(WordList):
 
 class Sentence(BaseBlob):
   """A sentence within a Text object. Inherits from :class:`BaseBlob <BaseBlob>`.
+
   :param sentence: A string, the raw sentence.
-  :param start_index: An int, the index where this sentence begins
-                      in Text. If not given, defaults to 0.
-  :param end_index: An int, the index where this sentence ends in
-                      a Text. If not given, defaults to the
-                      length of the sentence - 1.
+  :param start_index: The character offset where this sentence begins in
+      the Text. Defaults to 0.
+  :param end_index: The character offset where this sentence ends in the
+      Text. Defaults to the length of the sentence - 1.
   """
 
   def __init__(self, sentence, start_index=0, end_index=None):
@@ -486,11 +459,7 @@ class Text(BaseBlob):
 
   @property
   def json(self):
-    '''The json representation of this blob.
-    .. versionchanged:: 0.5.1
-        Made ``json`` a property instead of a method to restore backwards
-        compatibility that was broken after version 0.4.0.
-    '''
+    '''The json representation of this blob.'''
     return self.to_json()
 
   def _create_sentence_objects(self):

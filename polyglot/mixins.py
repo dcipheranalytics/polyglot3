@@ -49,8 +49,7 @@ class StringlikeMixin(object):
     '''Make blob objects behave like Python strings.
 
     Expects that classes that use this mixin to have a _strkey() method that
-    returns the string to apply string methods to. Using _strkey() instead
-    of __str__ ensures consistent behavior between Python 2 and 3.
+    returns the string to apply string methods to.
     '''
 
     def __repr__(self):

@@ -3,6 +3,7 @@
 
 """Defines classes related to mapping vocabulary to n-dimensional points."""
 
+import copy
 from io import open
 import logging
 
@@ -92,7 +93,11 @@ class Embedding(object):
     if inplace:
       self.vectors = vectors.T
       return self
-    return Embedding(vectors=vectors.T, vocabulary=self.vocabulary)
+    # Copy instead of calling the constructor: an expanded vocabulary has
+    # more words than vectors.
+    normalized = copy.copy(self)
+    normalized.vectors = vectors.T
+    return normalized
 
   def nearest_neighbors(self, word, top_k=10):
     """Return the nearest k words to the given `word`.

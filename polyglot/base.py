@@ -95,13 +95,12 @@ class TextFile(object):
     self.buf = StringIO()
 
   def iter_delimiter(self, byte_size=8192):
-    """ Generalization of the default iter file delimited by '\n'.
+    r""" Generalization of the default iter file delimited by '\n'.
+
     Note:
-      The newline string can be arbitrarily long; it need not be restricted to a
-      single character. You can also set the read size and control whether or not
-      the newline string is left on the end of the iterated lines.  Setting
-      newline to '\0' is particularly good for use with an input file created with
-      something like "os.popen('find -print0')".
+      The delimiter can be arbitrarily long; it need not be restricted to a
+      single character. Setting it to '\0' is particularly good for use with
+      an input file created with something like "os.popen('find -print0')".
 
     Args:
       byte_size (integer): Number of bytes to be read at each time.
