@@ -44,7 +44,6 @@ class TaggerBase(object):
 
   @staticmethod
   def ngrams(sequence, n, transfer=None):
-    ngrams_ = []
     part1 = (n-1) * [TaggerBase.PAD] + [TaggerBase.START]
     if transfer is not None:
         part2 = [transfer(_) for _ in sequence]
@@ -84,7 +83,6 @@ class TaggerBase(object):
     # TODO(rmyeid): use expanders.
     words = [w if w in self.embeddings else TaggerBase.UNK for w in sent]
     ngrams = TaggerBase.ngrams(words, self.context, self.transfer)
-    fvs = []
     for word, ngram in zip(sent, ngrams):
       fv = np.array([self.embeddings.get(w, self.embeddings.zero_vector()) for w in ngram]).flatten()
       if self.add_bias:

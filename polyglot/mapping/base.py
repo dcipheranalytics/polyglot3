@@ -3,9 +3,7 @@
 
 """ Supports word embeddings."""
 
-from io import open, StringIO
 from collections import Counter
-import os
 from concurrent.futures import ProcessPoolExecutor
 
 
@@ -89,7 +87,7 @@ class VocabularyBase(object):
   def get(self, k, default=None):
     try:
       return self[k]
-    except KeyError as e:
+    except KeyError:
       return default
 
   def getstate(self):

@@ -64,3 +64,11 @@ include = ["polyglot*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "polyglot"]
+
+[tool.ruff]
+target-version = "py39"
+extend-exclude = ["docs"]
+
+[tool.ruff.lint]
+# Errors only (syntax, undefined names, unused imports/variables); no style rules.
+select = ["E9", "F"]

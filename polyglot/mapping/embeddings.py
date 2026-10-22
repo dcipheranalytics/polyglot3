@@ -5,8 +5,6 @@
 
 from io import open
 import logging
-from os import path
-import tarfile
 
 import numpy as np
 from numpy import float32
@@ -69,7 +67,7 @@ class Embedding(object):
   def get(self, k, default=None):
     try:
       return self[k]
-    except KeyError as e:
+    except KeyError:
       return default
 
   def most_frequent(self, k, inplace=False):
@@ -193,7 +191,7 @@ class Embedding(object):
       for line_no, line in enumerate(fin):
         try:
           parts = _decode(line).strip().split()
-        except TypeError as e:
+        except TypeError:
           parts = line.strip().split()
         except Exception as e:
           logger.warning("We ignored line number {} because of erros in parsing"
@@ -211,7 +209,6 @@ class Embedding(object):
           logger.warning("We ignored line number {} because of unrecognized "
                           "number of columns {}".format(line_no, parts[:-layer1_size]))
           continue
-        index = line_no
         words.append(word)
         vectors.append(weights)
       vectors = np.asarray(vectors, dtype=np.float32)
@@ -250,12 +247,12 @@ class Embedding(object):
   def _from_glove(fname):
     with _open(fname, 'rb') as fin:
       words = []
-      vocab_size, layer1_size = None, None
+      layer1_size = None
       vectors = []
       for line_no, line in enumerate(fin):
         try:
           parts = _decode(line).strip().split()
-        except TypeError as e:
+        except TypeError:
           parts = line.strip().split()
         except Exception as e:
           logger.warning("We ignored line number {} because of erros in parsing"
@@ -273,7 +270,6 @@ class Embedding(object):
           logger.warning("We ignored line number {} because of unrecognized "
                           "number of columns {}".format(line_no, parts[:-layer1_size]))
           continue
-        index = line_no
         words.append(word)
         vectors.append(weights)
       vectors = np.asarray(vectors, dtype=np.float32)

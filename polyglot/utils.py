@@ -4,7 +4,6 @@
 """Collection of general utilities."""
 
 from os import path
-import os
 import tarfile
 
 

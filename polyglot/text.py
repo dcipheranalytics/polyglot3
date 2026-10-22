@@ -7,16 +7,13 @@ from collections import defaultdict
 
 import numpy as np
 
-from polyglot.base import Sequence, TextFile, TextFiles
+from polyglot.base import Sequence
 from polyglot.detect import Detector, Language
 from polyglot.decorators import cached_property
-from polyglot.downloader import Downloader
 from polyglot.load import load_embeddings
-from polyglot.mapping import CountedVocabulary
 from polyglot.mixins import BlobComparableMixin, StringlikeMixin
 from polyglot.tag import get_pos_tagger, get_transfer_pos_tagger, get_ner_tagger
 from polyglot.tokenize import SentenceTokenizer, WordTokenizer
-from polyglot.utils import _print
 
 
 class BaseBlob(StringlikeMixin, BlobComparableMixin):
@@ -110,7 +107,6 @@ class BaseBlob(StringlikeMixin, BlobComparableMixin):
   def entities(self):
     """Returns a list of entities for this blob."""
     start = 0
-    end = 0
     prev_tag = u'O'
     chunks = []
     for i, (w, tag) in enumerate(self.ne_chunker.annotate(self.words)):
@@ -189,17 +185,6 @@ class BaseBlob(StringlikeMixin, BlobComparableMixin):
         u'fr'
     """
     return self.language.code
-
-  def correct(self):
-    """Attempt to correct the spelling of a blob.
-    .. versionadded:: 0.6.0
-    :rtype: :class:`BaseBlob <BaseBlob>`
-    """
-    # regex matches: contraction or word or punctuation or whitespace
-    tokens = nltk.tokenize.regexp_tokenize(self.raw, r"\w*('\w*)+|\w+|[^\w\s]|\s")
-    corrected = (Word(w).correct() for w in tokens)
-    ret = ''.join(corrected)
-    return self.__class__(ret)
 
   def _cmpkey(self):
     """Key used by ComparableMixin to implement all rich comparison
@@ -379,7 +364,7 @@ class Chunk(WordList):
     #: The start index within a Text
     self.start = start_index
     #: The end index within a Text
-    self.end = end_index or len(sentence) - 1
+    self.end = end_index or start_index + len(subsequence)
     class_name = self.__class__.__name__
     self.tag = tag if tag else class_name
 

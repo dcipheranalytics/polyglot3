@@ -46,6 +46,7 @@ def test_download_package(server, tmp_path):
   assert (tmp_path / "data/ner2/xx/xx_ner.pkl.tar.bz2").read_bytes() == b"ner model"
   assert d.status("ner2.xx") == Downloader.INSTALLED
   assert d.status("pos2.xx") == Downloader.NOT_INSTALLED
+  assert d.status("ner2.xx", download_dir=str(tmp_path / "elsewhere")) == Downloader.NOT_INSTALLED
 
 
 def test_download_language_collection(server, tmp_path):

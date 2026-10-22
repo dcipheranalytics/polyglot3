@@ -21,10 +21,10 @@ class VocabExpander(OrderedVocabulary):
   def __getitem__(self, key):
     try:
       return self._vocab[key]
-    except KeyError as e:
+    except KeyError:
       try:
         return self.aux_word_id[key]
-      except KeyError as e:
+      except KeyError:
         return self.approximate_ids(key)
 
   def __contains__(self, key):

@@ -1,73 +1,37 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Polyglot Toolkit: Corpus & Model Downloader
+# Polyglot Toolkit: Model Downloader
 #
 # Copyright (C) 2014-2015 Polyglot Project
 # Author: Rami Al-Rfou <rmyeid@gmail.com>
-# URL: <http://bit.ly/embeddings/>
-# For license information, see LICENSE.TXT
+# Adapted from NLTK's downloader. For license information, see LICENSE.
 
 """
-The Polyglot corpus and module downloader.  This module defines several
-interfaces which can be used to download corpora, models, and other
-data packages that can be used with polyglot.
+The polyglot model downloader.
 
-Downloading Packages
-====================
-If called with no arguments, ``download()`` will display an interactive
-interface which can be used to download and install new packages.
-If Tkinter is available, then a graphical interface will be shown,
-otherwise a simple text interface will be provided.
+Packages are named ``<task>.<language>``, e.g. ``ner2.tr`` or
+``embeddings2.cs``. Collections group packages by language (``LANG:tr``) or
+by task (``TASK:ner2``)::
 
-Individual packages can be downloaded by calling the ``download()``
-function with a single argument, giving the package identifier for the
-package that should be downloaded:
+  >>> from polyglot.downloader import downloader
+  >>> downloader.download("LANG:tr")  # doctest: +SKIP
 
-  >>> download('treebank') # doctest: +SKIP
-  [polyglot_data] Downloading package 'treebank'...
-  [polyglot_data]   Unzipping corpora/treebank.zip.
-
-Polyglot also provides a number of \"package collections\", consisting of
-a group of related packages.  To download all packages in a
-colleciton, simply call ``download()`` with the collection's
-identifier:
-
-  >>> download('all-corpora') # doctest: +SKIP
-  [polyglot_data] Downloading package 'abc'...
-  [polyglot_data]   Unzipping corpora/abc.zip.
-  [polyglot_data] Downloading package 'alpino'...
-  [polyglot_data]   Unzipping corpora/alpino.zip.
-    ...
-  [polyglot_data] Downloading package 'words'...
-  [polyglot_data]   Unzipping corpora/words.zip.
+The same is available from the command line as ``polyglot download LANG:tr``.
+Called without a package, ``download()`` starts a small interactive shell.
 
 Download Directory
 ==================
-By default, packages are installed in either a system-wide directory
-(if Python has sufficient access to write to it); or in the current
-user's home directory.  However, the ``download_dir`` argument may be
-used to specify a different installation target, if desired.
+Packages are installed under ``$POLYGLOT_DATA_PATH/polyglot_data``
+(default ``~/polyglot_data``; ``%APPDATA%`` on Windows), or wherever the
+``download_dir`` argument points.
 
-See ``Downloader.default_download_dir()`` for more a detailed
-description of how the default download directory is chosen.
-
-Polyglot Download Server
-====================
-Before downloading any packages, the corpus and module downloader
-contacts the Polyglot download server, to retrieve an index file
-describing the available packages.  By default, this index file is
-loaded from ``http://nltk.googlecode.com/svn/trunk/polyglot_data/index.xml``.
-If necessary, it is possible to create a new ``Downloader`` object,
-specifying a different URL for the package index file.
-
-Usage::
-
-  python polyglot/downloader.py [-d DATADIR] [-q] [-f] [-k] PACKAGE_IDS
-
-or::
-
-  python -m polyglot.downloader [-d DATADIR] [-q] [-f] [-k] PACKAGE_IDS
+Download Server
+===============
+The index (``index.json``) and packages are fetched from
+``Downloader.DEFAULT_URL``, a Hugging Face dataset repository by default.
+Set ``POLYGLOT_DATA_URL`` or pass ``server_index_url`` to use a mirror; see
+``tools/data/build_index.py`` for building the index of a mirror.
 """
 #----------------------------------------------------------------------
 
@@ -77,7 +41,6 @@ import os
 import zipfile
 import sys
 import textwrap
-import threading
 import itertools
 from hashlib import md5
 from io import open
@@ -765,7 +728,7 @@ class Downloader(object):
     else:
       filepath = os.path.join(download_dir, info.filename)
       if download_dir != self._download_dir:
-        status = self._pkg_status(info, filepath)
+        return self._pkg_status(info, filepath)
       else:
         if info.id not in self._status_cache:
           self._status_cache[info.id] = self._pkg_status(info,
@@ -943,11 +906,11 @@ class Downloader(object):
     else: raise ValueError("You should pass either the task or the lang")
     try:
       return self.info(id)
-    except ValueError as e:
+    except ValueError:
       if lang: raise LanguageNotSupported("Language {} is not supported".format(id))
       if task: raise TaskNotSupported("Task {} is not supported".format(id))
 
-  def supported_language(lang):
+  def supported_language(self, lang):
     """Return True if polyglot supports the language.
 
     Args:
@@ -956,7 +919,7 @@ class Downloader(object):
     try:
       self.get_collection(lang=lang)
       return True
-    except LanguageNotSupported as e:
+    except LanguageNotSupported:
       return False
 
   def supported_languages(self, task=None):
@@ -1123,7 +1086,6 @@ class DownloaderShell(object):
   def _simple_interactive_update(self):
     while True:
       stale_packages = []
-      stale = partial = False
       for info in sorted(getattr(self._ds, 'packages')(), key=str):
         if self._ds.status(info) == self._ds.STALE:
           stale_packages.append((info.id, info.name))
@@ -1232,7 +1194,7 @@ def _unzip_iter(filename, root, verbose=True):
     sys.stdout.flush()
 
   try: zf = zipfile.ZipFile(filename)
-  except zipfile.error as e:
+  except zipfile.error:
     yield ErrorMessage(filename, 'Error with downloaded zip file')
     return
   except Exception as e:
@@ -1280,182 +1242,6 @@ def _unzip_iter(filename, root, verbose=True):
     print()
 
 ######################################################################
-# Index Builder
-######################################################################
-# This may move to a different file sometime.
-import subprocess, zipfile
-
-def build_index(root, base_url):
-  """
-  Create a new data.xml index file, by combining the xml description
-  files for various packages and collections.  ``root`` should be the
-  path to a directory containing the package xml and zip files; and
-  the collection xml files.  The ``root`` directory is expected to
-  have the following subdirectories::
-
-    root/
-    packages/ .................. subdirectory for packages
-      corpora/ ................. zip & xml files for corpora
-      grammars/ ................ zip & xml files for grammars
-      taggers/ ................. zip & xml files for taggers
-      tokenizers/ .............. zip & xml files for tokenizers
-      etc.
-    collections/ ............... xml files for collections
-
-  For each package, there should be two files: ``package.zip``
-  (where *package* is the package name)
-  which contains the package itself as a compressed zip file; and
-  ``package.xml``, which is an xml description of the package.  The
-  zipfile ``package.zip`` should expand to a single subdirectory
-  named ``package/``.  The base filename ``package`` must match
-  the identifier given in the package's xml file.
-
-  For each collection, there should be a single file ``collection.zip``
-  describing the collection, where *collection* is the name of the collection.
-
-  All identifiers (for both packages and collections) must be unique.
-  """
-  # Find all packages.
-  packages = []
-  for pkg_xml, zf, subdir in _find_packages(os.path.join(root, 'packages')):
-    zipstat = os.stat(zf.filename)
-    url = '%s/%s/%s' % (base_url, subdir, os.path.split(zf.filename)[1])
-    unzipped_size = sum(zf_info.file_size for zf_info in zf.infolist())
-
-    # Fill in several fields of the package xml with calculated values.
-    pkg_xml.set('unzipped_size', '%s' % unzipped_size)
-    pkg_xml.set('size', '%s' % zipstat.st_size)
-    pkg_xml.set('subdir', subdir)
-    pkg_xml.set('url', url)
-
-    # Record the package.
-    packages.append(pkg_xml)
-
-  # Find all collections
-  collections = list(_find_collections(os.path.join(root, 'collections')))
-
-  # Check that all UIDs are unique
-  uids = set()
-  for item in packages+collections:
-    if item.get('id') in uids:
-      raise ValueError('Duplicate UID: %s' % item.get('id'))
-    uids.add(item.get('id'))
-
-  # Put it all together
-  top_elt = ElementTree.Element('polyglot_data')
-  top_elt.append(ElementTree.Element('packages'))
-  for package in packages: top_elt[0].append(package)
-  top_elt.append(ElementTree.Element('collections'))
-  for collection in collections: top_elt[1].append(collection)
-
-  _indent_xml(top_elt)
-  return top_elt
-
-def _indent_xml(xml, prefix=''):
-  """
-  Helper for ``build_index()``: Given an XML ``ElementTree``, modify it
-  (and its descendents) ``text`` and ``tail`` attributes to generate
-  an indented tree, where each nested element is indented by 2
-  spaces with respect to its parent.
-  """
-  if len(xml) > 0:
-    xml.text = (xml.text or '').strip() + '\n' + prefix + '  '
-    for child in xml:
-      _indent_xml(child, prefix+'  ')
-    for child in xml[:-1]:
-      child.tail = (child.tail or '').strip() + '\n' + prefix + '  '
-    xml[-1].tail = (xml[-1].tail or '').strip() + '\n' + prefix
-
-def _check_package(pkg_xml, zipfilename, zf):
-  """
-  Helper for ``build_index()``: Perform some checks to make sure that
-  the given package is consistent.
-  """
-  # The filename must patch the id given in the XML file.
-  uid = os.path.splitext(os.path.split(zipfilename)[1])[0]
-  if pkg_xml.get('id') != uid:
-    raise ValueError('package identifier mismatch (%s vs %s)' %
-             (pkg_xml.get('id'), uid))
-
-  # Zip file must expand to a subdir whose name matches uid.
-  if sum( (name!=uid and not name.startswith(uid+'/'))
-      for name in zf.namelist() ):
-    raise ValueError('Zipfile %s.zip does not expand to a single '
-             'subdirectory %s/' % (uid, uid))
-
-# update for git?
-def _svn_revision(filename):
-  """
-  Helper for ``build_index()``: Calculate the subversion revision
-  number for a given file (by using ``subprocess`` to run ``svn``).
-  """
-  p = subprocess.Popen(['svn', 'status', '-v', filename],
-             stdout=subprocess.PIPE,
-             stderr=subprocess.PIPE)
-  (stdout, stderr) = p.communicate()
-  if p.returncode != 0 or stderr or not stdout:
-    raise ValueError('Error determining svn_revision for %s: %s' %
-             (os.path.split(filename)[1], textwrap.fill(stderr)))
-  return stdout.split()[2]
-
-def _find_collections(root):
-  """
-  Helper for ``build_index()``: Yield a list of ElementTree.Element
-  objects, each holding the xml for a single package collection.
-  """
-  packages = []
-  for dirname, subdirs, files in os.walk(root):
-    for filename in files:
-      if filename.endswith('.xml'):
-        xmlfile = os.path.join(dirname, filename)
-        yield ElementTree.parse(xmlfile).getroot()
-
-def _find_packages(root):
-  """
-  Helper for ``build_index()``: Yield a list of tuples
-  ``(pkg_xml, zf, subdir)``, where:
-    - ``pkg_xml`` is an ``ElementTree.Element`` holding the xml for a
-    package
-    - ``zf`` is a ``zipfile.ZipFile`` for the package's contents.
-    - ``subdir`` is the subdirectory (relative to ``root``) where
-    the package was found (e.g. 'corpora' or 'grammars').
-  """
-  # Find all packages.
-  packages = []
-  for dirname, subdirs, files in os.walk(root):
-    relpath = '/'.join(_path_from(root, dirname))
-    for filename in files:
-      if filename.endswith('.xml'):
-        xmlfilename = os.path.join(dirname, filename)
-        zipfilename = xmlfilename[:-4]+'.zip'
-        try: zf = zipfile.ZipFile(zipfilename)
-        except Exception as e:
-          raise ValueError('Error reading file %r!\n%s' %
-                   (zipfilename, e))
-        try: pkg_xml = ElementTree.parse(xmlfilename).getroot()
-        except Exception as e:
-          raise ValueError('Error reading file %r!\n%s' %
-                   (xmlfilename, e))
-
-        # Check that the UID matches the filename
-        uid = os.path.split(xmlfilename[:-4])[1]
-        if pkg_xml.get('id') != uid:
-          raise ValueError('package identifier mismatch (%s '
-                   'vs %s)' % (pkg_xml.get('id'), uid))
-
-        # Check that the zipfile expands to a subdir whose
-        # name matches the uid.
-        if sum( (name!=uid and not name.startswith(uid+'/'))
-            for name in zf.namelist() ):
-          raise ValueError('Zipfile %s.zip does not expand to a '
-                   'single subdirectory %s/' % (uid, uid))
-
-        yield pkg_xml, zf, relpath
-    # Don't recurse into svn subdirectories:
-    try: subdirs.remove('.svn')
-    except ValueError: pass
-
-######################################################################
 # Main:
 ######################################################################
 
@@ -1465,10 +1251,7 @@ def _find_packages(root):
 downloader = Downloader()
 
 def download_shell():
-  DownloaderShell(_downloader).run()
-
-def download_gui():
-  DownloaderGUI(_downloader).mainloop()
+  DownloaderShell(downloader).run()
 
 def update():
-  _downloader.update()
+  downloader.update()

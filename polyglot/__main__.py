@@ -2,9 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from io import open
-from argparse import ArgumentParser, FileType
-from collections import Counter
+from argparse import ArgumentParser
 if sys.platform == 'win32':
   from signal import signal, SIGABRT, SIG_DFL
 else:
@@ -16,6 +14,7 @@ from polyglot.detect import Detector
 from polyglot.downloader import Downloader
 from polyglot.mapping import CountedVocabulary
 from polyglot.tag import NEChunker, POSTagger
+from polyglot.text import Word
 from polyglot.tokenize import SentenceTokenizer, WordTokenizer
 from polyglot.utils import _print
 
@@ -66,6 +65,16 @@ def pos_tag(args):
   """Tag words with their part of speech."""
   tagger = POSTagger(lang=args.lang)
   tag(tagger, args)
+
+
+def sentiment(args):
+  """Print the polarity (-1, 0 or 1) of each word."""
+  for l in args.input:
+    words = l.strip().split()
+    line_annotations = [u"{:<16}{:>2}".format(w, Word(w, language=args.lang).polarity)
+                        for w in words]
+    _print(u"\n".join(line_annotations))
+    _print(u"")
 
 
 def cat(args):
@@ -205,6 +214,7 @@ def main():
   # Sentiment Analysis
   senti = subparsers.add_parser('sentiment',
                                 help="Classify text to positive and negative polarity.")
+  senti.set_defaults(func=sentiment)
   for name, subparser in parser._subparsers._group_actions[0].choices.items():
     if name == 'download': continue
     subparser.add_argument('--input', nargs='*', type=TextFile,
