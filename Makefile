@@ -3,12 +3,10 @@
 help:
 	@echo "clean-build - remove build artifacts"
 	@echo "clean-pyc - remove Python file artifacts"
-	@echo "lint - check style with flake8"
-	@echo "test - run tests quickly with the default Python"
-	@echo "test-all - run tests on every Python version with tox"
-	@echo "coverage - check code coverage quickly with the default Python"
+	@echo "lint - check for errors with ruff"
+	@echo "test - run tests with the default Python"
 	@echo "docs - generate Sphinx HTML documentation, including API docs"
-	@echo "release - package and upload a release"
+	@echo "release - package and upload a release to PyPI"
 	@echo "dist - package"
 
 clean: clean-build clean-pyc
@@ -25,35 +23,23 @@ clean-pyc:
 	find . -name '*~' -exec rm -f {} +
 
 lint:
-	flake8 polyglot tests
+	ruff check polyglot tests tools
 
 test:
-	python setup.py test
-
-test-all:
-	tox
-
-coverage:
-	coverage run --source polyglot setup.py test
-	coverage report -m
-	coverage html
-	open htmlcov/index.html
+	python -m pytest
 
 docs:
-	./nb2rst.sh
 	rm -f docs/polyglot.rst
 	rm -f docs/modules.rst
 	sphinx-apidoc -o docs/ polyglot
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	rm -f docs/*tests*rst
-	xdg-open docs/_build/html/index.html
 
-release: clean
-	python setup.py sdist upload
-	python setup.py bdist_wheel upload
+release: dist
+	python -m twine upload dist/*
 
 dist: clean
-	python setup.py sdist
-	python setup.py bdist_wheel
+	python -m build
+	python -m twine check dist/*
 	ls -l dist

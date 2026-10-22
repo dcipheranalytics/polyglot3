@@ -67,9 +67,10 @@ def test_checksum_mismatch_removes_file(server, tmp_path):
 
 def test_default_url_from_environment():
   # DEFAULT_URL is read at import time; check the override in a fresh interpreter.
+  import os
   import subprocess
   out = subprocess.run(
       [sys.executable, "-c", "from polyglot.downloader import Downloader; print(Downloader.DEFAULT_URL)"],
-      env={"POLYGLOT_DATA_URL": "https://example.org/data/", "PATH": ""},
+      env=dict(os.environ, POLYGLOT_DATA_URL="https://example.org/data/"),
       capture_output=True, text=True, check=True)
   assert out.stdout.strip() == "https://example.org/data/"

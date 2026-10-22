@@ -1,2 +1,0 @@
-fasttext-langdetect>=1.1.1
-numpy>=1.6.1
